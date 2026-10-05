@@ -1,0 +1,344 @@
+<title>Analyst Bench Pilot-1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a benchmark scoreboard. Product ledger up top, then the evidence panels (accuracy vs speed, per-task grid,
+   time strips, error profile), then the full metric sheet and the method notes. Slate neutrals, one teal accent,
+   four categorical product hues. */
+:root{
+  --bg:#f3f5f7; --panel:#ffffff; --ink:#18202a; --muted:#5c6876; --line:#dfe4ea; --soft:#eef1f5;
+  --accent:#0f7c86; --accent-ink:#ffffff;
+  --good:#1f8a5b; --warn:#b7791f; --bad:#c2453b;
+  --p1:#4b55c8; --p2:#c4622d; --p3:#3f4752; --p4:#1d8a74;
+  --heat0:#f7d9d4; --heat1:#f6e9c9; --heat2:#d7ecdf; --heat3:#b4dec7;
+  --display:"Bricolage Grotesque","IBM Plex Sans",sans-serif;
+  --body:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#11161c; --panel:#18202a; --ink:#e7ecf1; --muted:#97a3b0; --line:#2a3440; --soft:#1f2833;
+  --accent:#3fb6be; --accent-ink:#0b1216;
+  --good:#4cc08a; --warn:#e0a84a; --bad:#ef7a6f;
+  --p1:#8b93f0; --p2:#ec9663; --p3:#b8c1cc; --p4:#4fc2a9;
+  --heat0:#4a2723; --heat1:#463c22; --heat2:#21402f; --heat3:#245a40; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161c; --panel:#18202a; --ink:#e7ecf1; --muted:#97a3b0; --line:#2a3440; --soft:#1f2833;
+  --accent:#3fb6be; --accent-ink:#0b1216;
+  --good:#4cc08a; --warn:#e0a84a; --bad:#ef7a6f;
+  --p1:#8b93f0; --p2:#ec9663; --p3:#b8c1cc; --p4:#4fc2a9;
+  --heat0:#4a2723; --heat1:#463c22; --heat2:#21402f; --heat3:#245a40; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--body);margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:28px 48px;display:grid;gap:22px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+h1{font-size:clamp(28px,4.2vw,44px);line-height:1.05;letter-spacing:-.01em;font-weight:700}
+h2{font-size:20px;font-weight:700}
+.eyebrow{font:600 12px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.lede{color:var(--muted);max-width:68ch;margin:8px 0 0}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+header{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;justify-content:space-between}
+header>div{min-width:0}
+.toggle{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--panel);gap:2px}
+.toggle button{font:600 13px var(--body);border:0;background:transparent;color:var(--muted);padding:7px 14px;border-radius:999px;cursor:pointer}
+.toggle button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+.toggle button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.vnote{font-size:12.5px;color:var(--muted);margin-top:6px;max-width:44ch}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 16px 14px;display:grid;gap:10px;position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--pc)}
+.card .top{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.card h3{font-size:19px}
+.rank{font:600 11px var(--mono);color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:2px 8px;white-space:nowrap}
+.model{font:12px var(--mono);color:var(--muted)}
+.big{display:flex;align-items:baseline;gap:8px}
+.big b{font:700 40px/1 var(--display);font-variant-numeric:tabular-nums}
+.big span{color:var(--muted);font-size:13px}
+.meter{height:8px;border-radius:999px;background:var(--soft);overflow:hidden}
+.meter i{display:block;height:100%;background:var(--pc);border-radius:999px;transition:width .4s ease}
+.kv{display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:13px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.chip{display:inline-block;font:600 11px var(--mono);padding:2px 7px;border-radius:6px;background:var(--soft);color:var(--muted)}
+.chip.bad{color:var(--bad)} .chip.good{color:var(--good)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:12px;min-width:0}
+.panel .head{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;justify-content:space-between}
+.panel p.sub{margin:0;color:var(--muted);font-size:13px;max-width:70ch}
+.grid2{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:14px}
+svg text{fill:var(--muted);font:11px var(--mono)}
+svg .lbl{fill:var(--ink);font:600 12px var(--body)}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th,td{padding:7px 8px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font:600 11.5px var(--mono);letter-spacing:.04em;color:var(--muted);text-transform:uppercase}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right}
+.heat td.cell{text-align:center;font:600 12.5px var(--mono);font-variant-numeric:tabular-nums;border-left:1px solid var(--panel);min-width:58px}
+.heat td.task{white-space:normal;min-width:190px}
+.heat .tid{font:600 12px var(--mono)} .heat .tdesc{display:block;color:var(--muted);font-size:12px}
+.heat th.prod{text-align:center;color:var(--ink);text-transform:none;font-family:var(--body);font-size:13px;border-bottom:3px solid var(--pc)}
+.heat th.rep{text-align:center}
+.mark{display:block;font-size:10.5px;font-weight:600;opacity:.85}
+.legend{display:flex;flex-wrap:wrap;gap:10px 16px;font-size:12px;color:var(--muted);align-items:center}
+.sw{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-3px;margin-right:5px}
+.strip{display:grid;grid-template-columns:110px minmax(0,1fr);gap:10px;align-items:center}
+.strip+.strip{margin-top:6px}
+.strip .name{font-weight:600;font-size:13px}
+.bars{display:grid;gap:10px}
+.bar-row{display:grid;grid-template-columns:110px minmax(0,1fr);gap:10px;align-items:center;font-size:13px}
+.twobar{display:grid;gap:4px}
+.twobar div{display:flex;align-items:center;gap:8px}
+.twobar .track{flex:1;height:10px;background:var(--soft);border-radius:999px;overflow:hidden}
+.twobar .fill{height:100%;border-radius:999px}
+.twobar .v{font:12px var(--mono);width:44px;text-align:right;color:var(--muted)}
+details{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px}
+summary{cursor:pointer;font:700 16px var(--display)}
+details ol{margin:10px 0 0;padding-left:20px;display:grid;gap:6px;color:var(--muted);font-size:13.5px;max-width:90ch}
+details b{color:var(--ink)}
+footer{color:var(--muted);font-size:12px}
+@media (max-width:980px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:520px){.cards{grid-template-columns:minmax(0,1fr)}.strip,.bar-row{grid-template-columns:84px minmax(0,1fr)}}
+@media (prefers-reduced-motion:reduce){.meter i{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Analyst Bench · Pilot-1 · 2026-10</div>
+      <h1>Four AI analyst agents, one set of business questions</h1>
+      <p class="lede">Nine analysis tasks on a synthetic mobile-game warehouse (300,000 accounts). Each product answered every task twice in fresh sessions, 20 minutes each. Blind answers were reviewed by AI judges from the other vendors (GPT, Claude, Grok) and scored by a deterministic grader.</p>
+    </div>
+    <div>
+      <div class="toggle" role="group" aria-label="Judge disagreement version">
+        <button id="v-lenient" aria-pressed="true" data-v="lenient">Lenient</button>
+        <button id="v-strict" aria-pressed="false" data-v="strict">Strict</button>
+      </div>
+      <div class="vnote" id="vnote"></div>
+    </div>
+  </header>
+
+  <section class="cards" id="cards" aria-label="Product overview"></section>
+
+  <div class="grid2">
+    <section class="panel">
+      <div class="head"><h2>Accuracy vs. speed</h2><span class="chip">log time axis</span></div>
+      <p class="sub">Vertical: pass rate on the core tasks (7 tasks × 2 attempts). Horizontal: median time per attempt. Up and to the left is better.</p>
+      <div id="scatter"></div>
+    </section>
+    <section class="panel">
+      <div class="head"><h2>Error profile</h2></div>
+      <p class="sub">Out of 18 answers per product: answers containing a wrong material claim (E), and answers where such an error came with no warning to the reader (silent error, S).</p>
+      <div class="bars" id="errors"></div>
+      <div class="legend"><span><span class="sw" style="background:var(--warn)"></span>Wrong claim (E)</span><span><span class="sw" style="background:var(--bad)"></span>Silent error (S)</span></div>
+    </section>
+  </div>
+
+  <section class="panel">
+    <div class="head"><h2>Scores by task</h2>
+      <div class="legend"><span><span class="sw" style="background:var(--heat3)"></span>≥ 95</span><span><span class="sw" style="background:var(--heat2)"></span>80–95</span><span><span class="sw" style="background:var(--heat1)"></span>50–80</span><span><span class="sw" style="background:var(--heat0)"></span>&lt; 50</span><span>✓ pass · ✗ fail · ⏱ timeout</span></div>
+    </div>
+    <p class="sub">Pass: core tasks need 80+ and no critical error; unanswerable tasks (Q26, Q27) need 75+ and no invented answer. r1 and r2 are the two independent attempts.</p>
+    <div class="scroll"><table class="heat" id="heat"></table></div>
+  </section>
+
+  <section class="panel">
+    <div class="head"><h2>Time per attempt</h2><span class="chip">cap 1,200 s</span></div>
+    <p class="sub">Each dot is one attempt (18 per product). Filled dots passed, hollow dots failed; the vertical tick is the median.</p>
+    <div id="strips"></div>
+  </section>
+
+  <section class="panel">
+    <div class="head"><h2>All metrics</h2><span class="chip" id="tablever"></span></div>
+    <div class="scroll"><table id="metrics"></table></div>
+  </section>
+
+  <details>
+    <summary>Method and disclosures</summary>
+    <ol>
+      <li><b>Products and settings:</b> Codex (gpt-6.1-sol, reasoning high), Claude Code (claude-opus-5-5, high), Grok Build (grok-4.7, high), Antigravity CLI (gemini-3.8-flash-high). All ran on personal subscriptions, in a fresh session per attempt, inside a local sandbox that could reach only the product's own inference service.</li>
+      <li><b>Judging:</b> each answer was judged by the panel judges from the other vendors: two judges for Codex, Claude Code and Grok Build, three for Antigravity (majority). Where two judges disagree, the lenient version takes the reading more favorable to the answer and the strict version the less favorable one. Automatic arithmetic checks were never overridden.</li>
+      <li><b>Speed-adjusted score:</b> for passing answers only, score × (1 + 10% × (1 − time / 1,200 s)). The rule was set during wave 2, when some timings but not the wave-2 accuracy were known.</li>
+      <li><b>Review protocol change:</b> the plan was owner review. Because of the workload (722 claim verdicts), it changed to AI judging after provisional scoring and before any review decision, and later to the cross-vendor panel.</li>
+      <li><b>Grader fixes after wave-1 results:</b> citing the provided task file counts as valid evidence; ISO interval notation is parsed correctly (this restored 20 points on each Codex Q07 answer).</li>
+      <li><b>Open policy point, left unchanged:</b> one Grok Build Q12 attempt hit the time cap, but the files saved by then scored 89–93 and the grader counts it as a pass. Under the design's rule that terminal failures count as failures, Grok Build's core accuracy would be 8/14 (lenient) and 7/14 (strict).</li>
+      <li><b>Product differences:</b> Antigravity's server-side web search could not be disabled; it used it 0 times in the scored attempts. Its sandbox also allowed localhost for its language server. Gemini CLI was blocked by Google's personal-account policy, so Antigravity CLI is the Google product. Grok had seen the reference answers earlier as the wave-1 judge (training and memory off).</li>
+      <li><b>Run conditions:</b> local sandbox, not a VM; both wave-1 repetitions ran on the same day; the quota pause threshold changed during wave 1.</li>
+      <li><b>Scale:</b> 18 attempts per product on one dataset. Differences are descriptive, not statistically established.</li>
+    </ol>
+  </details>
+  <footer>Analyst Bench · Pilot-1 · Figures from the grader output (scorer r3). This page contains no reference answers.</footer>
+</div>
+
+<script>
+const DATA = {"products":["Codex","Claude Code","Grok Build","Antigravity"],"versions":{"lenient":{"Codex":{"core":[14,14],"abst":[4,4],"trap":[22,22],"E":[2,18],"S":[2,18],"mean":100.0,"speed":106.93,"cph":9.77,"med":331,"medsucc":331,"total_min":110.6,"reps":"9/9","timeouts":0,"tasks":{"Q12":{"r1":[100.0,true,626,"completed"],"r2":[100.0,true,689,"completed"]},"Q03":{"r1":[100.0,true,188,"completed"],"r2":[100.0,true,212,"completed"]},"Q07":{"r1":[100.0,true,493,"completed"],"r2":[100.0,true,428,"completed"]},"Q14":{"r1":[100.0,true,704,"completed"],"r2":[100.0,true,460,"completed"]},"Q26":{"r1":[100.0,true,242,"completed"],"r2":[100.0,true,217,"completed"]},"Q27":{"r1":[100.0,true,136,"completed"],"r2":[100.0,true,125,"completed"]},"Q16":{"r1":[100.0,true,455,"completed"],"r2":[100.0,true,288,"completed"]},"Q17":{"r1":[100.0,true,690,"completed"],"r2":[100.0,true,374,"completed"]},"Q04":{"r1":[100.0,true,143,"completed"],"r2":[100.0,true,164,"completed"]}}},"Claude Code":{"core":[10,14],"abst":[4,4],"trap":[19,22],"E":[7,18],"S":[3,18],"mean":83.73,"speed":90.72,"cph":23.44,"med":116,"medsucc":107,"total_min":35.8,"reps":"7/9","timeouts":0,"tasks":{"Q12":{"r1":[92.9,true,193,"completed"],"r2":[89.3,true,174,"completed"]},"Q03":{"r1":[100.0,true,66,"completed"],"r2":[100.0,true,66,"completed"]},"Q07":{"r1":[100.0,true,131,"completed"],"r2":[0.0,false,162,"completed"]},"Q14":{"r1":[25.0,false,211,"completed"],"r2":[25.0,false,127,"completed"]},"Q26":{"r1":[100.0,true,115,"completed"],"r2":[100.0,true,92,"completed"]},"Q27":{"r1":[100.0,true,73,"completed"],"r2":[100.0,true,113,"completed"]},"Q16":{"r1":[100.0,true,117,"completed"],"r2":[75.0,false,135,"completed"]},"Q17":{"r1":[100.0,true,163,"completed"],"r2":[100.0,true,101,"completed"]},"Q04":{"r1":[100.0,true,57,"completed"],"r2":[100.0,true,53,"completed"]}}},"Grok Build":{"core":[9,14],"abst":[3,4],"trap":[20,22],"E":[7,18],"S":[4,18],"mean":78.95,"speed":81.51,"cph":3.07,"med":849,"medsucc":685,"total_min":234.7,"reps":"7/9","timeouts":1,"tasks":{"Q12":{"r1":[88.1,true,879,"completed"],"r2":[93.0,true,1200,"timeout"]},"Q03":{"r1":[100.0,true,486,"completed"],"r2":[100.0,true,465,"completed"]},"Q07":{"r1":[40.0,false,764,"completed"],"r2":[0.0,false,702,"completed"]},"Q14":{"r1":[50.0,false,1013,"completed"],"r2":[50.0,false,1038,"completed"]},"Q26":{"r1":[50.0,false,883,"completed"],"r2":[75.0,true,820,"completed"]},"Q27":{"r1":[100.0,true,306,"completed"],"r2":[100.0,true,551,"completed"]},"Q16":{"r1":[100.0,true,1083,"completed"],"r2":[100.0,true,949,"completed"]},"Q17":{"r1":[100.0,true,990,"completed"],"r2":[75.0,false,937,"completed"]},"Q04":{"r1":[100.0,true,489,"completed"],"r2":[100.0,true,527,"completed"]}}},"Antigravity":{"core":[7,14],"abst":[2,4],"trap":[18,22],"E":[15,18],"S":[14,18],"mean":81.61,"speed":85.49,"cph":6.6,"med":275,"medsucc":243,"total_min":81.8,"reps":"8/9","timeouts":0,"tasks":{"Q12":{"r1":[74.7,false,328,"completed"],"r2":[74.7,false,375,"completed"]},"Q03":{"r1":[100.0,true,193,"completed"],"r2":[100.0,true,243,"completed"]},"Q07":{"r1":[100.0,true,279,"completed"],"r2":[100.0,true,377,"completed"]},"Q14":{"r1":[25.0,false,288,"completed"],"r2":[75.0,false,330,"completed"]},"Q26":{"r1":[50.0,false,198,"completed"],"r2":[50.0,false,219,"completed"]},"Q27":{"r1":[100.0,true,239,"completed"],"r2":[100.0,true,273,"completed"]},"Q16":{"r1":[90.0,true,278,"completed"],"r2":[75.0,false,240,"completed"]},"Q17":{"r1":[77.5,false,282,"completed"],"r2":[77.0,false,336,"completed"]},"Q04":{"r1":[100.0,true,212,"completed"],"r2":[100.0,true,216,"completed"]}}}},"strict":{"Codex":{"core":[14,14],"abst":[4,4],"trap":[21,22],"E":[4,18],"S":[4,18],"mean":97.89,"speed":104.68,"cph":9.77,"med":331,"medsucc":331,"total_min":110.6,"reps":"9/9","timeouts":0,"tasks":{"Q12":{"r1":[96.0,true,626,"completed"],"r2":[96.0,true,689,"completed"]},"Q03":{"r1":[100.0,true,188,"completed"],"r2":[100.0,true,212,"completed"]},"Q07":{"r1":[100.0,true,493,"completed"],"r2":[80.0,true,428,"completed"]},"Q14":{"r1":[100.0,true,704,"completed"],"r2":[100.0,true,460,"completed"]},"Q26":{"r1":[95.0,true,242,"completed"],"r2":[95.0,true,217,"completed"]},"Q27":{"r1":[100.0,true,136,"completed"],"r2":[100.0,true,125,"completed"]},"Q16":{"r1":[100.0,true,455,"completed"],"r2":[100.0,true,288,"completed"]},"Q17":{"r1":[100.0,true,690,"completed"],"r2":[100.0,true,374,"completed"]},"Q04":{"r1":[100.0,true,143,"completed"],"r2":[100.0,true,164,"completed"]}}},"Claude Code":{"core":[10,14],"abst":[4,4],"trap":[19,22],"E":[13,18],"S":[11,18],"mean":82.76,"speed":89.73,"cph":23.44,"med":116,"medsucc":107,"total_min":35.8,"reps":"7/9","timeouts":0,"tasks":{"Q12":{"r1":[92.9,true,193,"completed"],"r2":[89.3,true,174,"completed"]},"Q03":{"r1":[100.0,true,66,"completed"],"r2":[100.0,true,66,"completed"]},"Q07":{"r1":[100.0,true,131,"completed"],"r2":[0.0,false,162,"completed"]},"Q14":{"r1":[25.0,false,211,"completed"],"r2":[12.5,false,127,"completed"]},"Q26":{"r1":[95.0,true,115,"completed"],"r2":[100.0,true,92,"completed"]},"Q27":{"r1":[100.0,true,73,"completed"],"r2":[100.0,true,113,"completed"]},"Q16":{"r1":[100.0,true,117,"completed"],"r2":[75.0,false,135,"completed"]},"Q17":{"r1":[100.0,true,163,"completed"],"r2":[100.0,true,101,"completed"]},"Q04":{"r1":[100.0,true,57,"completed"],"r2":[100.0,true,53,"completed"]}}},"Grok Build":{"core":[8,14],"abst":[3,4],"trap":[20,22],"E":[10,18],"S":[9,18],"mean":76.87,"speed":79.3,"cph":2.81,"med":849,"medsucc":551,"total_min":234.7,"reps":"6/9","timeouts":1,"tasks":{"Q12":{"r1":[86.0,true,879,"completed"],"r2":[89.3,true,1200,"timeout"]},"Q03":{"r1":[100.0,true,486,"completed"],"r2":[100.0,true,465,"completed"]},"Q07":{"r1":[33.3,false,764,"completed"],"r2":[0.0,false,702,"completed"]},"Q14":{"r1":[50.0,false,1013,"completed"],"r2":[50.0,false,1038,"completed"]},"Q26":{"r1":[50.0,false,883,"completed"],"r2":[75.0,true,820,"completed"]},"Q27":{"r1":[100.0,true,306,"completed"],"r2":[100.0,true,551,"completed"]},"Q16":{"r1":[100.0,true,1083,"completed"],"r2":[75.0,false,949,"completed"]},"Q17":{"r1":[100.0,true,990,"completed"],"r2":[75.0,false,937,"completed"]},"Q04":{"r1":[100.0,true,489,"completed"],"r2":[100.0,true,527,"completed"]}}},"Antigravity":{"core":[7,14],"abst":[2,4],"trap":[18,22],"E":[15,18],"S":[14,18],"mean":81.61,"speed":85.49,"cph":6.6,"med":275,"medsucc":243,"total_min":81.8,"reps":"8/9","timeouts":0,"tasks":{"Q12":{"r1":[74.7,false,328,"completed"],"r2":[74.7,false,375,"completed"]},"Q03":{"r1":[100.0,true,193,"completed"],"r2":[100.0,true,243,"completed"]},"Q07":{"r1":[100.0,true,279,"completed"],"r2":[100.0,true,377,"completed"]},"Q14":{"r1":[25.0,false,288,"completed"],"r2":[75.0,false,330,"completed"]},"Q26":{"r1":[50.0,false,198,"completed"],"r2":[50.0,false,219,"completed"]},"Q27":{"r1":[100.0,true,239,"completed"],"r2":[100.0,true,273,"completed"]},"Q16":{"r1":[90.0,true,278,"completed"],"r2":[75.0,false,240,"completed"]},"Q17":{"r1":[77.5,false,282,"completed"],"r2":[77.0,false,336,"completed"]},"Q04":{"r1":[100.0,true,212,"completed"],"r2":[100.0,true,216,"completed"]}}}}}};
+
+const META = {
+  "Codex":{model:"gpt-6.1-sol · high",color:"var(--p1)"},
+  "Claude Code":{model:"claude-opus-5-5 · high",color:"var(--p2)"},
+  "Grok Build":{model:"grok-4.7 · high",color:"var(--p3)"},
+  "Antigravity":{model:"gemini-3.8-flash-high",color:"var(--p4)"}
+};
+const TASKS = [
+  ["Q03","S15 week-8 gross, refunds and net bookings","core"],
+  ["Q04","S03 first-week cohort D7 retention by platform","core"],
+  ["Q07","S08 26-week bookings reconciliation and reusable extract","core"],
+  ["Q12","S04 week-14 drop in cash and returning players","core"],
+  ["Q14","Is channel C's week-6 ARPU on S01 a real signal?","core"],
+  ["Q16","S02 channel A vs B D30 ROAS dispute","core"],
+  ["Q17","S11 price test: can offer B ship?","core"],
+  ["Q26","Why did the big refund happen?","unanswerable"],
+  ["Q27","Final D180 LTV of June cohorts","unanswerable"]
+];
+const VNOTE = {lenient:"Lenient: where two judges disagree, the reading more favorable to the answer counts (Antigravity: majority of three).",
+               strict:"Strict: where two judges disagree, the reading less favorable to the answer counts (Antigravity: majority of three)."};
+let version = "lenient";
+try { const s = localStorage.getItem("ab-version"); if (s === "strict" || s === "lenient") version = s; } catch (e) {}
+
+const pct = (a) => a[1] ? Math.round(100 * a[0] / a[1]) : 0;
+const esc = (s) => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function ranks(v) {
+  const P = DATA.products.slice();
+  P.sort((a, b) => {
+    const A = DATA.versions[v][a], B = DATA.versions[v][b];
+    return (B.core[0] - A.core[0]) || (B.mean - A.mean);
+  });
+  const r = {}; P.forEach((p, i) => r[p] = i + 1); return r;
+}
+
+function renderCards(v) {
+  const r = ranks(v);
+  document.getElementById("cards").innerHTML = DATA.products.map(p => {
+    const d = DATA.versions[v][p];
+    return `<article class="card" style="--pc:${META[p].color}">
+      <div class="top"><h3>${esc(p)}</h3><span class="rank">#${r[p]} accuracy</span></div>
+      <div class="model">${esc(META[p].model)}</div>
+      <div class="big"><b>${d.core[0]}/${d.core[1]}</b><span>core passes</span></div>
+      <div class="meter" aria-hidden="true"><i style="width:${pct(d.core)}%"></i></div>
+      <dl class="kv">
+        <dt>Unanswerable handled</dt><dd>${d.abst[0]}/${d.abst[1]}</dd>
+        <dt>Mean score</dt><dd>${d.mean.toFixed(1)}</dd>
+        <dt>Speed-adjusted</dt><dd>${d.speed.toFixed(1)}</dd>
+        <dt>Median time</dt><dd>${d.med} s</dd>
+        <dt>Wrong claims (E)</dt><dd>${d.E[0]}/18</dd>
+      </dl>
+      <div>${d.timeouts ? `<span class="chip bad">${d.timeouts} timeout</span>` : `<span class="chip good">no timeouts</span>`} <span class="chip">repeat agreement ${d.reps}</span></div>
+    </article>`;
+  }).join("");
+}
+
+function renderScatter(v) {
+  const W = 560, H = 320, L = 52, R = 24, T = 18, B = 42;
+  const xmin = Math.log10(60), xmax = Math.log10(1200);
+  const x = s => L + (Math.log10(Math.max(60, s)) - xmin) / (xmax - xmin) * (W - L - R);
+  const y = p => T + (1 - p / 100) * (H - T - B);
+  let g = "";
+  [0, 25, 50, 75, 100].forEach(t => {
+    g += `<line x1="${L}" x2="${W - R}" y1="${y(t)}" y2="${y(t)}" stroke="var(--line)" stroke-width="1"/>`;
+    g += `<text x="${L - 8}" y="${y(t) + 4}" text-anchor="end">${t}%</text>`;
+  });
+  [60, 120, 300, 600, 1200].forEach(t => {
+    g += `<line x1="${x(t)}" x2="${x(t)}" y1="${T}" y2="${H - B}" stroke="var(--line)" stroke-width="1" stroke-dasharray="2 4"/>`;
+    g += `<text x="${x(t)}" y="${H - B + 16}" text-anchor="middle">${t}s</text>`;
+  });
+  g += `<text x="${(L + W - R) / 2}" y="${H - 6}" text-anchor="middle">median time per attempt (s, log scale)</text>`;
+  const pts = DATA.products.map(p => ({p, d: DATA.versions[v][p]}));
+  pts.forEach(({p, d}) => {
+    const cx = x(d.med), cy = y(pct(d.core));
+    const left = cx > W - 150;
+    g += `<circle cx="${cx}" cy="${cy}" r="9" fill="${META[p].color}" stroke="var(--panel)" stroke-width="2"/>`;
+    g += `<text class="lbl" x="${left ? cx - 14 : cx + 14}" y="${cy - 2}" text-anchor="${left ? "end" : "start"}">${esc(p)}</text>`;
+    g += `<text x="${left ? cx - 14 : cx + 14}" y="${cy + 13}" text-anchor="${left ? "end" : "start"}">${d.core[0]}/14 · ${d.med}s</text>`;
+  });
+  document.getElementById("scatter").innerHTML =
+    `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Core pass rate vs median time">${g}</svg>`;
+}
+
+function renderErrors(v) {
+  document.getElementById("errors").innerHTML = DATA.products.map(p => {
+    const d = DATA.versions[v][p];
+    return `<div class="bar-row"><span style="font-weight:600">${esc(p)}</span>
+      <div class="twobar">
+        <div><div class="track"><div class="fill" style="width:${100 * d.E[0] / 18}%;background:var(--warn)"></div></div><span class="v">${d.E[0]}/18</span></div>
+        <div><div class="track"><div class="fill" style="width:${100 * d.S[0] / 18}%;background:var(--bad)"></div></div><span class="v">${d.S[0]}/18</span></div>
+      </div></div>`;
+  }).join("");
+}
+
+function heatColor(s) {
+  return s >= 95 ? "var(--heat3)" : s >= 80 ? "var(--heat2)" : s >= 50 ? "var(--heat1)" : "var(--heat0)";
+}
+
+function renderHeat(v) {
+  const P = DATA.products;
+  let h = `<thead><tr><th rowspan="2">Task</th>${P.map(p => `<th class="prod" colspan="2" style="--pc:${META[p].color}">${esc(p)}</th>`).join("")}</tr>
+           <tr>${P.map(() => `<th class="rep">r1</th><th class="rep">r2</th>`).join("")}</tr></thead><tbody>`;
+  TASKS.forEach(([t, desc, kind]) => {
+    h += `<tr><td class="task"><span class="tid">${t}</span> <span class="chip">${kind}</span><span class="tdesc">${esc(desc)}</span></td>`;
+    P.forEach(p => ["r1", "r2"].forEach(r => {
+      const [score, ok, sec, outcome] = DATA.versions[v][p].tasks[t][r];
+      const mark = outcome === "timeout" ? "⏱ " + (ok ? "✓" : "✗") : (ok ? "✓" : "✗");
+      h += `<td class="cell" style="background:${heatColor(score)}" title="${esc(p)} ${t} ${r}: ${score}, ${ok ? "pass" : "fail"}, ${sec} s${outcome === "timeout" ? " (timeout)" : ""}">${score % 1 ? score.toFixed(1) : score}<span class="mark">${mark}</span></td>`;
+    }));
+    h += `</tr>`;
+  });
+  document.getElementById("heat").innerHTML = h + `</tbody>`;
+}
+
+function renderStrips(v) {
+  const W = 760, H = 34, L = 6, R = 10;
+  const x = s => L + Math.min(s, 1200) / 1200 * (W - L - R);
+  let out = "";
+  DATA.products.forEach((p, i) => {
+    const d = DATA.versions[v][p];
+    const runs = [];
+    Object.values(d.tasks).forEach(o => ["r1", "r2"].forEach(r => runs.push(o[r])));
+    let g = `<line x1="${L}" x2="${W - R}" y1="${H / 2}" y2="${H / 2}" stroke="var(--line)" stroke-width="2"/>`;
+    g += `<line x1="${x(1200)}" x2="${x(1200)}" y1="4" y2="${H - 4}" stroke="var(--bad)" stroke-width="1.5" stroke-dasharray="3 3"/>`;
+    runs.sort((a, b) => a[2] - b[2]).forEach(([score, ok, sec], k) => {
+      const jitter = (k % 3 - 1) * 6;
+      g += ok ? `<circle cx="${x(sec)}" cy="${H / 2 + jitter}" r="5" fill="${META[p].color}"/>`
+              : `<circle cx="${x(sec)}" cy="${H / 2 + jitter}" r="4.5" fill="var(--panel)" stroke="${META[p].color}" stroke-width="2"/>`;
+    });
+    g += `<line x1="${x(d.med)}" x2="${x(d.med)}" y1="3" y2="${H - 3}" stroke="var(--ink)" stroke-width="2"/>`;
+    out += `<div class="strip"><span class="name">${esc(p)}<br><span class="mono" style="color:var(--muted);font-weight:400;font-size:12px">median ${d.med}s</span></span>
+      <svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" preserveAspectRatio="none" role="img" aria-label="${esc(p)} time per attempt">${g}</svg></div>`;
+  });
+  const axis = [0, 300, 600, 900, 1200].map(t => `<text x="${x(t)}" y="12" text-anchor="${t === 0 ? "start" : t === 1200 ? "end" : "middle"}">${t}s</text>`).join("");
+  out += `<div class="strip"><span></span><svg viewBox="0 0 ${W} 16" width="100%" height="16" preserveAspectRatio="none" aria-hidden="true">${axis}</svg></div>`;
+  document.getElementById("strips").innerHTML = out;
+}
+
+function renderMetrics(v) {
+  const P = DATA.products, d = p => DATA.versions[v][p];
+  const rows = [
+    ["Core accuracy", p => `${d(p).core[0]}/${d(p).core[1]}`],
+    ["Unanswerable handled", p => `${d(p).abst[0]}/${d(p).abst[1]}`],
+    ["Trap recall", p => `${d(p).trap[0]}/${d(p).trap[1]}`],
+    ["Answers with a wrong claim (E)", p => `${d(p).E[0]}/18`],
+    ["Silent errors (S)", p => `${d(p).S[0]}/18`],
+    ["Mean score", p => d(p).mean.toFixed(1)],
+    ["Speed-adjusted score (≤ +10%)", p => d(p).speed.toFixed(1)],
+    ["Correct answers per agent hour", p => d(p).cph.toFixed(1)],
+    ["Median time, all", p => `${d(p).med}s`],
+    ["Median time, passing", p => `${d(p).medsucc}s`],
+    ["Total agent time", p => `${d(p).total_min} min`],
+    ["Same result in both attempts", p => d(p).reps],
+    ["Timeouts", p => String(d(p).timeouts)]
+  ];
+  document.getElementById("metrics").innerHTML =
+    `<thead><tr><th>Metric</th>${P.map(p => `<th style="text-align:right">${esc(p)}</th>`).join("")}</tr></thead><tbody>` +
+    rows.map(([name, f]) => `<tr><td>${name}</td>${P.map(p => `<td class="num">${f(p)}</td>`).join("")}</tr>`).join("") + `</tbody>`;
+  document.getElementById("tablever").textContent = v === "lenient" ? "Lenient" : "Strict";
+}
+
+function render() {
+  document.querySelectorAll(".toggle button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === version)));
+  document.getElementById("vnote").textContent = VNOTE[version];
+  renderCards(version); renderScatter(version); renderErrors(version); renderHeat(version); renderStrips(version); renderMetrics(version);
+}
+document.querySelectorAll(".toggle button").forEach(b => b.addEventListener("click", () => {
+  version = b.dataset.v;
+  try { localStorage.setItem("ab-version", version); } catch (e) {}
+  render();
+}));
+render();
+</script>

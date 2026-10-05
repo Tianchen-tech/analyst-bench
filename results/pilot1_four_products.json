@@ -1,0 +1,1916 @@
+{
+ "rubric_version": "r3",
+ "versions": {
+  "lenient": {
+   "Codex": {
+    "aggregate": {
+     "core_accuracy": {
+      "numerator": 14,
+      "denominator": 14,
+      "value": 1.0
+     },
+     "valid_abstention": {
+      "numerator": 4,
+      "denominator": 4,
+      "value": 1.0
+     },
+     "trap_recall": {
+      "numerator": 22,
+      "denominator": 22,
+      "value": 1.0
+     },
+     "silent_error_rate": {
+      "numerator": 2,
+      "denominator": 18,
+      "value": 0.1111111111111111
+     },
+     "silent_error_incidence_per_attempt": {
+      "numerator": 2,
+      "denominator": 18,
+      "value": 0.1111111111111111
+     },
+     "conditional_silence_among_errors": {
+      "numerator": 2,
+      "denominator": 2,
+      "value": 1.0
+     },
+     "completion": {
+      "numerator": 18,
+      "denominator": 18,
+      "value": 1.0
+     },
+     "over_abstention": {
+      "numerator": 0,
+      "denominator": 14,
+      "value": 0.0
+     },
+     "terminal_failures": [],
+     "format_failures": [],
+     "infrastructure_reruns_required": []
+    },
+    "errors_E": 2,
+    "mean_score": 100.0,
+    "mean_speed_adjusted_score": 106.93,
+    "correct_per_agent_hour": 9.77,
+    "median_seconds_all": 331.08500000000004,
+    "median_seconds_successful": 331.08500000000004,
+    "total_agent_minutes": 110.6,
+    "same_success_both_reps": "9/9",
+    "per_task": {
+     "Q12": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 626.217,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 689.415,
+       "outcome": "completed"
+      }
+     },
+     "Q03": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 187.857,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 211.508,
+       "outcome": "completed"
+      }
+     },
+     "Q07": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 492.995,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 427.759,
+       "outcome": "completed"
+      }
+     },
+     "Q14": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 703.584,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 459.523,
+       "outcome": "completed"
+      }
+     },
+     "Q26": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 241.515,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 217.412,
+       "outcome": "completed"
+      }
+     },
+     "Q27": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 135.936,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 124.51,
+       "outcome": "completed"
+      }
+     },
+     "Q16": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 455.364,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 288.149,
+       "outcome": "completed"
+      }
+     },
+     "Q17": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 690.25,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 374.021,
+       "outcome": "completed"
+      }
+     },
+     "Q04": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 143.054,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 164.387,
+       "outcome": "completed"
+      }
+     }
+    }
+   },
+   "Claude Code": {
+    "aggregate": {
+     "core_accuracy": {
+      "numerator": 10,
+      "denominator": 14,
+      "value": 0.7142857142857143
+     },
+     "valid_abstention": {
+      "numerator": 4,
+      "denominator": 4,
+      "value": 1.0
+     },
+     "trap_recall": {
+      "numerator": 19,
+      "denominator": 22,
+      "value": 0.8636363636363636
+     },
+     "silent_error_rate": {
+      "numerator": 3,
+      "denominator": 18,
+      "value": 0.16666666666666666
+     },
+     "silent_error_incidence_per_attempt": {
+      "numerator": 3,
+      "denominator": 18,
+      "value": 0.16666666666666666
+     },
+     "conditional_silence_among_errors": {
+      "numerator": 3,
+      "denominator": 7,
+      "value": 0.42857142857142855
+     },
+     "completion": {
+      "numerator": 18,
+      "denominator": 18,
+      "value": 1.0
+     },
+     "over_abstention": {
+      "numerator": 0,
+      "denominator": 14,
+      "value": 0.0
+     },
+     "terminal_failures": [],
+     "format_failures": [],
+     "infrastructure_reruns_required": [
+      "P1-Q16-claude_code_print-r2"
+     ]
+    },
+    "errors_E": 7,
+    "mean_score": 83.73,
+    "mean_speed_adjusted_score": 90.72,
+    "correct_per_agent_hour": 23.44,
+    "median_seconds_all": 116.1495,
+    "median_seconds_successful": 107.0015,
+    "total_agent_minutes": 35.8,
+    "same_success_both_reps": "7/9",
+    "per_task": {
+     "Q12": {
+      "r1": {
+       "score": 92.9,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 193.171,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 89.3,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 173.854,
+       "outcome": "completed"
+      }
+     },
+     "Q03": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 66.449,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 65.887,
+       "outcome": "completed"
+      }
+     },
+     "Q07": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 130.962,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 0.0,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 162.275,
+       "outcome": "completed"
+      }
+     },
+     "Q14": {
+      "r1": {
+       "score": 25.0,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 0,
+       "elapsed_s": 210.793,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 25.0,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 126.995,
+       "outcome": "completed"
+      }
+     },
+     "Q26": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 115.372,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 0,
+       "elapsed_s": 92.255,
+       "outcome": "completed"
+      }
+     },
+     "Q27": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 73.012,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 112.721,
+       "outcome": "completed"
+      }
+     },
+     "Q16": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 116.927,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 75.0,
+       "success": false,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 134.874,
+       "outcome": "completed"
+      }
+     },
+     "Q17": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 0,
+       "elapsed_s": 162.772,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 0,
+       "elapsed_s": 101.282,
+       "outcome": "completed"
+      }
+     },
+     "Q04": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 57.299,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 52.942,
+       "outcome": "completed"
+      }
+     }
+    }
+   },
+   "Grok Build": {
+    "aggregate": {
+     "core_accuracy": {
+      "numerator": 9,
+      "denominator": 14,
+      "value": 0.6428571428571429
+     },
+     "valid_abstention": {
+      "numerator": 3,
+      "denominator": 4,
+      "value": 0.75
+     },
+     "trap_recall": {
+      "numerator": 20,
+      "denominator": 22,
+      "value": 0.9090909090909091
+     },
+     "silent_error_rate": {
+      "numerator": 4,
+      "denominator": 18,
+      "value": 0.2222222222222222
+     },
+     "silent_error_incidence_per_attempt": {
+      "numerator": 4,
+      "denominator": 18,
+      "value": 0.2222222222222222
+     },
+     "conditional_silence_among_errors": {
+      "numerator": 4,
+      "denominator": 7,
+      "value": 0.5714285714285714
+     },
+     "completion": {
+      "numerator": 17,
+      "denominator": 18,
+      "value": 0.9444444444444444
+     },
+     "over_abstention": {
+      "numerator": 0,
+      "denominator": 14,
+      "value": 0.0
+     },
+     "terminal_failures": [
+      "P1-Q12-grok_build-r2"
+     ],
+     "format_failures": [],
+     "infrastructure_reruns_required": []
+    },
+    "errors_E": 7,
+    "mean_score": 78.95,
+    "mean_speed_adjusted_score": 81.51,
+    "correct_per_agent_hour": 3.07,
+    "median_seconds_all": 849.2365,
+    "median_seconds_successful": 685.472,
+    "total_agent_minutes": 234.7,
+    "same_success_both_reps": "7/9",
+    "per_task": {
+     "Q12": {
+      "r1": {
+       "score": 88.1,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 878.776,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 93.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 1200.0,
+       "outcome": "timeout"
+      }
+     },
+     "Q03": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 486.384,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 464.607,
+       "outcome": "completed"
+      }
+     },
+     "Q07": {
+      "r1": {
+       "score": 40.0,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 0,
+       "elapsed_s": 764.122,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 0.0,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 702.386,
+       "outcome": "completed"
+      }
+     },
+     "Q14": {
+      "r1": {
+       "score": 50.0,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 1013.391,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 50.0,
+       "success": false,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 1038.221,
+       "outcome": "completed"
+      }
+     },
+     "Q26": {
+      "r1": {
+       "score": 50.0,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 882.856,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 75.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 819.697,
+       "outcome": "completed"
+      }
+     },
+     "Q27": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 306.119,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 551.247,
+       "outcome": "completed"
+      }
+     },
+     "Q16": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 0,
+       "elapsed_s": 1082.945,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 949.258,
+       "outcome": "completed"
+      }
+     },
+     "Q17": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 989.951,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 75.0,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 0,
+       "elapsed_s": 937.178,
+       "outcome": "completed"
+      }
+     },
+     "Q04": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 489.113,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 526.968,
+       "outcome": "completed"
+      }
+     }
+    }
+   },
+   "Antigravity": {
+    "aggregate": {
+     "core_accuracy": {
+      "numerator": 7,
+      "denominator": 14,
+      "value": 0.5
+     },
+     "valid_abstention": {
+      "numerator": 2,
+      "denominator": 4,
+      "value": 0.5
+     },
+     "trap_recall": {
+      "numerator": 18,
+      "denominator": 22,
+      "value": 0.8181818181818182
+     },
+     "silent_error_rate": {
+      "numerator": 14,
+      "denominator": 18,
+      "value": 0.7777777777777778
+     },
+     "silent_error_incidence_per_attempt": {
+      "numerator": 14,
+      "denominator": 18,
+      "value": 0.7777777777777778
+     },
+     "conditional_silence_among_errors": {
+      "numerator": 14,
+      "denominator": 15,
+      "value": 0.9333333333333333
+     },
+     "completion": {
+      "numerator": 18,
+      "denominator": 18,
+      "value": 1.0
+     },
+     "over_abstention": {
+      "numerator": 0,
+      "denominator": 14,
+      "value": 0.0
+     },
+     "terminal_failures": [],
+     "format_failures": [],
+     "infrastructure_reruns_required": []
+    },
+    "errors_E": 15,
+    "mean_score": 81.61,
+    "mean_speed_adjusted_score": 85.49,
+    "correct_per_agent_hour": 6.6,
+    "median_seconds_all": 275.476,
+    "median_seconds_successful": 243.022,
+    "total_agent_minutes": 81.8,
+    "same_success_both_reps": "8/9",
+    "per_task": {
+     "Q12": {
+      "r1": {
+       "score": 74.7,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 327.792,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 74.7,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 374.908,
+       "outcome": "completed"
+      }
+     },
+     "Q03": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 192.769,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 243.022,
+       "outcome": "completed"
+      }
+     },
+     "Q07": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 278.623,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 376.99,
+       "outcome": "completed"
+      }
+     },
+     "Q14": {
+      "r1": {
+       "score": 25.0,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 288.212,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 75.0,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 330.395,
+       "outcome": "completed"
+      }
+     },
+     "Q26": {
+      "r1": {
+       "score": 50.0,
+       "success": false,
+       "critical": true,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 198.224,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 50.0,
+       "success": false,
+       "critical": true,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 219.406,
+       "outcome": "completed"
+      }
+     },
+     "Q27": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 239.015,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 273.247,
+       "outcome": "completed"
+      }
+     },
+     "Q16": {
+      "r1": {
+       "score": 90.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 0,
+       "elapsed_s": 277.705,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 75.0,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 239.91,
+       "outcome": "completed"
+      }
+     },
+     "Q17": {
+      "r1": {
+       "score": 77.5,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 281.705,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 77.0,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 336.468,
+       "outcome": "completed"
+      }
+     },
+     "Q04": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 212.451,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 216.079,
+       "outcome": "completed"
+      }
+     }
+    }
+   }
+  },
+  "strict": {
+   "Codex": {
+    "aggregate": {
+     "core_accuracy": {
+      "numerator": 14,
+      "denominator": 14,
+      "value": 1.0
+     },
+     "valid_abstention": {
+      "numerator": 4,
+      "denominator": 4,
+      "value": 1.0
+     },
+     "trap_recall": {
+      "numerator": 21,
+      "denominator": 22,
+      "value": 0.9545454545454546
+     },
+     "silent_error_rate": {
+      "numerator": 4,
+      "denominator": 18,
+      "value": 0.2222222222222222
+     },
+     "silent_error_incidence_per_attempt": {
+      "numerator": 4,
+      "denominator": 18,
+      "value": 0.2222222222222222
+     },
+     "conditional_silence_among_errors": {
+      "numerator": 4,
+      "denominator": 4,
+      "value": 1.0
+     },
+     "completion": {
+      "numerator": 18,
+      "denominator": 18,
+      "value": 1.0
+     },
+     "over_abstention": {
+      "numerator": 0,
+      "denominator": 14,
+      "value": 0.0
+     },
+     "terminal_failures": [],
+     "format_failures": [],
+     "infrastructure_reruns_required": []
+    },
+    "errors_E": 4,
+    "mean_score": 97.89,
+    "mean_speed_adjusted_score": 104.68,
+    "correct_per_agent_hour": 9.77,
+    "median_seconds_all": 331.08500000000004,
+    "median_seconds_successful": 331.08500000000004,
+    "total_agent_minutes": 110.6,
+    "same_success_both_reps": "9/9",
+    "per_task": {
+     "Q12": {
+      "r1": {
+       "score": 96.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 626.217,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 96.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 689.415,
+       "outcome": "completed"
+      }
+     },
+     "Q03": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 187.857,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 211.508,
+       "outcome": "completed"
+      }
+     },
+     "Q07": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 492.995,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 80.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 427.759,
+       "outcome": "completed"
+      }
+     },
+     "Q14": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 703.584,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 459.523,
+       "outcome": "completed"
+      }
+     },
+     "Q26": {
+      "r1": {
+       "score": 95.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 241.515,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 95.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 217.412,
+       "outcome": "completed"
+      }
+     },
+     "Q27": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 135.936,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 124.51,
+       "outcome": "completed"
+      }
+     },
+     "Q16": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 455.364,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 288.149,
+       "outcome": "completed"
+      }
+     },
+     "Q17": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 690.25,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 374.021,
+       "outcome": "completed"
+      }
+     },
+     "Q04": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 143.054,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 164.387,
+       "outcome": "completed"
+      }
+     }
+    }
+   },
+   "Claude Code": {
+    "aggregate": {
+     "core_accuracy": {
+      "numerator": 10,
+      "denominator": 14,
+      "value": 0.7142857142857143
+     },
+     "valid_abstention": {
+      "numerator": 4,
+      "denominator": 4,
+      "value": 1.0
+     },
+     "trap_recall": {
+      "numerator": 19,
+      "denominator": 22,
+      "value": 0.8636363636363636
+     },
+     "silent_error_rate": {
+      "numerator": 11,
+      "denominator": 18,
+      "value": 0.6111111111111112
+     },
+     "silent_error_incidence_per_attempt": {
+      "numerator": 11,
+      "denominator": 18,
+      "value": 0.6111111111111112
+     },
+     "conditional_silence_among_errors": {
+      "numerator": 11,
+      "denominator": 13,
+      "value": 0.8461538461538461
+     },
+     "completion": {
+      "numerator": 18,
+      "denominator": 18,
+      "value": 1.0
+     },
+     "over_abstention": {
+      "numerator": 0,
+      "denominator": 14,
+      "value": 0.0
+     },
+     "terminal_failures": [],
+     "format_failures": [],
+     "infrastructure_reruns_required": [
+      "P1-Q16-claude_code_print-r2"
+     ]
+    },
+    "errors_E": 13,
+    "mean_score": 82.76,
+    "mean_speed_adjusted_score": 89.73,
+    "correct_per_agent_hour": 23.44,
+    "median_seconds_all": 116.1495,
+    "median_seconds_successful": 107.0015,
+    "total_agent_minutes": 35.8,
+    "same_success_both_reps": "7/9",
+    "per_task": {
+     "Q12": {
+      "r1": {
+       "score": 92.9,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 193.171,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 89.3,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 173.854,
+       "outcome": "completed"
+      }
+     },
+     "Q03": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 66.449,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 65.887,
+       "outcome": "completed"
+      }
+     },
+     "Q07": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 130.962,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 0.0,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 162.275,
+       "outcome": "completed"
+      }
+     },
+     "Q14": {
+      "r1": {
+       "score": 25.0,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 210.793,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 12.5,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 126.995,
+       "outcome": "completed"
+      }
+     },
+     "Q26": {
+      "r1": {
+       "score": 95.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 115.372,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 0,
+       "elapsed_s": 92.255,
+       "outcome": "completed"
+      }
+     },
+     "Q27": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 73.012,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 112.721,
+       "outcome": "completed"
+      }
+     },
+     "Q16": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 116.927,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 75.0,
+       "success": false,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 134.874,
+       "outcome": "completed"
+      }
+     },
+     "Q17": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 0,
+       "elapsed_s": 162.772,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 101.282,
+       "outcome": "completed"
+      }
+     },
+     "Q04": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 57.299,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 52.942,
+       "outcome": "completed"
+      }
+     }
+    }
+   },
+   "Grok Build": {
+    "aggregate": {
+     "core_accuracy": {
+      "numerator": 8,
+      "denominator": 14,
+      "value": 0.5714285714285714
+     },
+     "valid_abstention": {
+      "numerator": 3,
+      "denominator": 4,
+      "value": 0.75
+     },
+     "trap_recall": {
+      "numerator": 20,
+      "denominator": 22,
+      "value": 0.9090909090909091
+     },
+     "silent_error_rate": {
+      "numerator": 9,
+      "denominator": 18,
+      "value": 0.5
+     },
+     "silent_error_incidence_per_attempt": {
+      "numerator": 9,
+      "denominator": 18,
+      "value": 0.5
+     },
+     "conditional_silence_among_errors": {
+      "numerator": 9,
+      "denominator": 10,
+      "value": 0.9
+     },
+     "completion": {
+      "numerator": 17,
+      "denominator": 18,
+      "value": 0.9444444444444444
+     },
+     "over_abstention": {
+      "numerator": 0,
+      "denominator": 14,
+      "value": 0.0
+     },
+     "terminal_failures": [
+      "P1-Q12-grok_build-r2"
+     ],
+     "format_failures": [],
+     "infrastructure_reruns_required": []
+    },
+    "errors_E": 10,
+    "mean_score": 76.87,
+    "mean_speed_adjusted_score": 79.3,
+    "correct_per_agent_hour": 2.81,
+    "median_seconds_all": 849.2365,
+    "median_seconds_successful": 551.247,
+    "total_agent_minutes": 234.7,
+    "same_success_both_reps": "6/9",
+    "per_task": {
+     "Q12": {
+      "r1": {
+       "score": 86.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 878.776,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 89.3,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 1200.0,
+       "outcome": "timeout"
+      }
+     },
+     "Q03": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 486.384,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 464.607,
+       "outcome": "completed"
+      }
+     },
+     "Q07": {
+      "r1": {
+       "score": 33.3,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 764.122,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 0.0,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 702.386,
+       "outcome": "completed"
+      }
+     },
+     "Q14": {
+      "r1": {
+       "score": 50.0,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 1013.391,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 50.0,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 1038.221,
+       "outcome": "completed"
+      }
+     },
+     "Q26": {
+      "r1": {
+       "score": 50.0,
+       "success": false,
+       "critical": true,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 882.856,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 75.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 819.697,
+       "outcome": "completed"
+      }
+     },
+     "Q27": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 306.119,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 551.247,
+       "outcome": "completed"
+      }
+     },
+     "Q16": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 1082.945,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 75.0,
+       "success": false,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 949.258,
+       "outcome": "completed"
+      }
+     },
+     "Q17": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 989.951,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 75.0,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 0,
+       "elapsed_s": 937.178,
+       "outcome": "completed"
+      }
+     },
+     "Q04": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 489.113,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 526.968,
+       "outcome": "completed"
+      }
+     }
+    }
+   },
+   "Antigravity": {
+    "aggregate": {
+     "core_accuracy": {
+      "numerator": 7,
+      "denominator": 14,
+      "value": 0.5
+     },
+     "valid_abstention": {
+      "numerator": 2,
+      "denominator": 4,
+      "value": 0.5
+     },
+     "trap_recall": {
+      "numerator": 18,
+      "denominator": 22,
+      "value": 0.8181818181818182
+     },
+     "silent_error_rate": {
+      "numerator": 14,
+      "denominator": 18,
+      "value": 0.7777777777777778
+     },
+     "silent_error_incidence_per_attempt": {
+      "numerator": 14,
+      "denominator": 18,
+      "value": 0.7777777777777778
+     },
+     "conditional_silence_among_errors": {
+      "numerator": 14,
+      "denominator": 15,
+      "value": 0.9333333333333333
+     },
+     "completion": {
+      "numerator": 18,
+      "denominator": 18,
+      "value": 1.0
+     },
+     "over_abstention": {
+      "numerator": 0,
+      "denominator": 14,
+      "value": 0.0
+     },
+     "terminal_failures": [],
+     "format_failures": [],
+     "infrastructure_reruns_required": []
+    },
+    "errors_E": 15,
+    "mean_score": 81.61,
+    "mean_speed_adjusted_score": 85.49,
+    "correct_per_agent_hour": 6.6,
+    "median_seconds_all": 275.476,
+    "median_seconds_successful": 243.022,
+    "total_agent_minutes": 81.8,
+    "same_success_both_reps": "8/9",
+    "per_task": {
+     "Q12": {
+      "r1": {
+       "score": 74.7,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 327.792,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 74.7,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 374.908,
+       "outcome": "completed"
+      }
+     },
+     "Q03": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 192.769,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 243.022,
+       "outcome": "completed"
+      }
+     },
+     "Q07": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 278.623,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 376.99,
+       "outcome": "completed"
+      }
+     },
+     "Q14": {
+      "r1": {
+       "score": 25.0,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 288.212,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 75.0,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 330.395,
+       "outcome": "completed"
+      }
+     },
+     "Q26": {
+      "r1": {
+       "score": 50.0,
+       "success": false,
+       "critical": true,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 198.224,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 50.0,
+       "success": false,
+       "critical": true,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 219.406,
+       "outcome": "completed"
+      }
+     },
+     "Q27": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 239.015,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 273.247,
+       "outcome": "completed"
+      }
+     },
+     "Q16": {
+      "r1": {
+       "score": 90.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 0,
+       "elapsed_s": 277.705,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 75.0,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 239.91,
+       "outcome": "completed"
+      }
+     },
+     "Q17": {
+      "r1": {
+       "score": 77.5,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 281.705,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 77.0,
+       "success": false,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 336.468,
+       "outcome": "completed"
+      }
+     },
+     "Q04": {
+      "r1": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 0,
+       "S": 0,
+       "elapsed_s": 212.451,
+       "outcome": "completed"
+      },
+      "r2": {
+       "score": 100.0,
+       "success": true,
+       "critical": false,
+       "E": 1,
+       "S": 1,
+       "elapsed_s": 216.079,
+       "outcome": "completed"
+      }
+     }
+    }
+   }
+  }
+ },
+ "notes": {
+  "antigravity_web_searches": 0
+ }
+}

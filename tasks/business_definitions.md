@@ -1,0 +1,7 @@
+- Payment status: only `succeeded` payments are bookings. `failed` and `pending` payment rows record attempts that did not complete and carry no cash.
+- Recorded amounts: for a `succeeded` payment, `amount_raw` is the amount actually charged, after any discount, in the row's declared unit. It can differ from `quantity` × the catalog list price. Use the recorded amount; do not rebuild it from the catalog. For `failed` and `pending` payments, `amount_raw` records the attempted charge amount, not cash received.
+- Refund status: only `succeeded` refunds return cash. A `pending` refund is an open request with no cash movement in this extract.
+- Refund currency: a refund is recorded in the original payment's currency, unit and booking FX rate. Normalize it the same way as the payment it refers to.
+- Event time versus arrival time: use `captured_at_utc` to date payments and `processed_at_utc` to date refunds. `ingested_at_utc` records when a row reached the warehouse; use it for data availability and the first-ingested deduplication rule.
+- Baseline spending: when accounts are grouped by their spending in a period before some later event, measure that baseline as gross successful bookings captured in the period, before refunds.
+- Acquisition attribution: `acquisition_channel` and `ua_spend.attributed_installs` use one fixed attribution per account. `ua_spend` rows for a date become available at 06:00 UTC on the following day.

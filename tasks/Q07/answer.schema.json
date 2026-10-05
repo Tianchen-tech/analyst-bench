@@ -1,0 +1,622 @@
+{
+ "$defs": {
+  "Action": {
+   "additionalProperties": false,
+   "properties": {
+    "action": {
+     "maxLength": 1000,
+     "minLength": 1,
+     "type": "string"
+    },
+    "priority": {
+     "maximum": 3,
+     "minimum": 1,
+     "type": "integer"
+    },
+    "rationale": {
+     "maxLength": 1000,
+     "minLength": 1,
+     "type": "string"
+    },
+    "stop_condition": {
+     "maxLength": 1000,
+     "minLength": 1,
+     "type": "string"
+    },
+    "success_metric": {
+     "maxLength": 1000,
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "priority",
+    "action",
+    "rationale",
+    "success_metric",
+    "stop_condition"
+   ],
+   "type": "object"
+  },
+  "AuditResult": {
+   "additionalProperties": false,
+   "properties": {
+    "findings": {
+     "items": {
+      "$ref": "#/$defs/Finding"
+     },
+     "maxItems": 30,
+     "type": "array"
+    },
+    "metrics": {
+     "items": {
+      "$ref": "#/$defs/Metric"
+     },
+     "maxItems": 200,
+     "type": "array"
+    },
+    "transformation_path": {
+     "maxLength": 1000,
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "metrics",
+    "findings",
+    "transformation_path"
+   ],
+   "type": "object"
+  },
+  "BusinessResult": {
+   "additionalProperties": false,
+   "properties": {
+    "actions": {
+     "items": {
+      "$ref": "#/$defs/Action"
+     },
+     "maxItems": 5,
+     "type": "array"
+    },
+    "metrics": {
+     "items": {
+      "$ref": "#/$defs/Metric"
+     },
+     "maxItems": 200,
+     "type": "array"
+    },
+    "missing_information": {
+     "items": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "type": "string"
+     },
+     "maxItems": 30,
+     "type": "array"
+    },
+    "recommendation": {
+     "maxLength": 1000,
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "metrics",
+    "recommendation",
+    "actions",
+    "missing_information"
+   ],
+   "type": "object"
+  },
+  "Check": {
+   "additionalProperties": false,
+   "properties": {
+    "evidence_ids": {
+     "items": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "type": "string"
+     },
+     "maxItems": 30,
+     "type": "array"
+    },
+    "name": {
+     "maxLength": 1000,
+     "minLength": 1,
+     "type": "string"
+    },
+    "p_value": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "passed": {
+     "anyOf": [
+      {
+       "type": "boolean"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "statistic": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    }
+   },
+   "required": [
+    "name",
+    "statistic",
+    "p_value",
+    "passed",
+    "evidence_ids"
+   ],
+   "type": "object"
+  },
+  "DiagnosisResult": {
+   "additionalProperties": false,
+   "properties": {
+    "conclusion": {
+     "maxLength": 1000,
+     "minLength": 1,
+     "type": "string"
+    },
+    "drivers": {
+     "items": {
+      "$ref": "#/$defs/Driver"
+     },
+     "maxItems": 30,
+     "type": "array"
+    },
+    "metrics": {
+     "items": {
+      "$ref": "#/$defs/Metric"
+     },
+     "maxItems": 200,
+     "type": "array"
+    }
+   },
+   "required": [
+    "metrics",
+    "drivers",
+    "conclusion"
+   ],
+   "type": "object"
+  },
+  "Driver": {
+   "additionalProperties": false,
+   "properties": {
+    "contribution": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "description": {
+     "maxLength": 1000,
+     "minLength": 1,
+     "type": "string"
+    },
+    "evidence_ids": {
+     "items": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "type": "string"
+     },
+     "maxItems": 30,
+     "type": "array"
+    },
+    "outcome": {
+     "maxLength": 1000,
+     "minLength": 1,
+     "type": "string"
+    },
+    "unit": {
+     "maxLength": 1000,
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "description",
+    "outcome",
+    "contribution",
+    "unit",
+    "evidence_ids"
+   ],
+   "type": "object"
+  },
+  "EstimateResult": {
+   "additionalProperties": false,
+   "properties": {
+    "conclusion": {
+     "maxLength": 1000,
+     "minLength": 1,
+     "type": "string"
+    },
+    "method": {
+     "maxLength": 1000,
+     "minLength": 1,
+     "type": "string"
+    },
+    "metrics": {
+     "items": {
+      "$ref": "#/$defs/Metric"
+     },
+     "maxItems": 200,
+     "type": "array"
+    }
+   },
+   "required": [
+    "metrics",
+    "method",
+    "conclusion"
+   ],
+   "type": "object"
+  },
+  "ExperimentResult": {
+   "additionalProperties": false,
+   "properties": {
+    "checks": {
+     "items": {
+      "$ref": "#/$defs/Check"
+     },
+     "maxItems": 30,
+     "type": "array"
+    },
+    "decision": {
+     "maxLength": 1000,
+     "minLength": 1,
+     "type": "string"
+    },
+    "metrics": {
+     "items": {
+      "$ref": "#/$defs/Metric"
+     },
+     "maxItems": 200,
+     "type": "array"
+    },
+    "rationale": {
+     "maxLength": 1000,
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "metrics",
+    "checks",
+    "decision",
+    "rationale"
+   ],
+   "type": "object"
+  },
+  "Finding": {
+   "additionalProperties": false,
+   "properties": {
+    "affected_rows": {
+     "anyOf": [
+      {
+       "type": "integer"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "amount_usd": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    },
+    "evidence_ids": {
+     "items": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "type": "string"
+     },
+     "maxItems": 30,
+     "type": "array"
+    },
+    "summary": {
+     "maxLength": 1000,
+     "minLength": 1,
+     "type": "string"
+    }
+   },
+   "required": [
+    "summary",
+    "affected_rows",
+    "amount_usd",
+    "evidence_ids"
+   ],
+   "type": "object"
+  },
+  "Metric": {
+   "additionalProperties": false,
+   "properties": {
+    "evidence_ids": {
+     "items": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "type": "string"
+     },
+     "maxItems": 30,
+     "type": "array"
+    },
+    "name": {
+     "maxLength": 1000,
+     "minLength": 1,
+     "type": "string"
+    },
+    "period": {
+     "maxLength": 1000,
+     "minLength": 1,
+     "type": "string"
+    },
+    "population": {
+     "maxLength": 1000,
+     "minLength": 1,
+     "type": "string"
+    },
+    "unit": {
+     "maxLength": 1000,
+     "minLength": 1,
+     "type": "string"
+    },
+    "value": {
+     "anyOf": [
+      {
+       "type": "number"
+      },
+      {
+       "type": "null"
+      }
+     ]
+    }
+   },
+   "required": [
+    "name",
+    "value",
+    "unit",
+    "population",
+    "period",
+    "evidence_ids"
+   ],
+   "type": "object"
+  }
+ },
+ "$id": "https://analyst-bench.invalid/schemas/Q07.schema.json",
+ "$schema": "https://json-schema.org/draft/2020-12/schema",
+ "additionalProperties": false,
+ "allOf": [
+  {
+   "if": {
+    "properties": {
+     "status": {
+      "enum": [
+       "answered",
+       "partial"
+      ]
+     }
+    }
+   },
+   "then": {
+    "properties": {
+     "result": {
+      "not": {
+       "type": "null"
+      }
+     }
+    }
+   }
+  }
+ ],
+ "properties": {
+  "assumptions": {
+   "items": {
+    "maxLength": 400,
+    "minLength": 1,
+    "type": "string"
+   },
+   "maxItems": 15,
+   "type": "array"
+  },
+  "claims": {
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "evidence_ids": {
+      "items": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "id": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "stance": {
+      "enum": [
+       "asserted",
+       "qualified",
+       "hypothesis"
+      ]
+     },
+     "text": {
+      "maxLength": 600,
+      "minLength": 1,
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "text",
+     "stance",
+     "evidence_ids"
+    ],
+    "type": "object"
+   },
+   "maxItems": 20,
+   "type": "array"
+  },
+  "evidence": {
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "description": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "id": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "locator": {
+      "minLength": 1,
+      "type": "string"
+     },
+     "path": {
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(^|/)\\.\\.(/|$))[^\\x00]+$",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "path",
+     "locator",
+     "description"
+    ],
+    "type": "object"
+   },
+   "maxItems": 30,
+   "type": "array"
+  },
+  "result": {
+   "anyOf": [
+    {
+     "additionalProperties": false,
+     "properties": {
+      "findings": {
+       "items": {
+        "$ref": "#/$defs/Finding"
+       },
+       "maxItems": 30,
+       "type": "array"
+      },
+      "metrics": {
+       "items": {
+        "$ref": "#/$defs/Metric"
+       },
+       "maxItems": 200,
+       "minItems": 26,
+       "type": "array"
+      },
+      "transformation_path": {
+       "maxLength": 1000,
+       "minLength": 1,
+       "type": "string"
+      }
+     },
+     "required": [
+      "metrics",
+      "findings",
+      "transformation_path"
+     ],
+     "type": "object"
+    },
+    {
+     "type": "null"
+    }
+   ]
+  },
+  "schema_version": {
+   "const": "1.1"
+  },
+  "status": {
+   "enum": [
+    "answered",
+    "partial",
+    "not_identifiable"
+   ]
+  },
+  "task_id": {
+   "const": "Q07"
+  },
+  "warnings": {
+   "items": {
+    "additionalProperties": false,
+    "properties": {
+     "claim_ids": {
+      "items": {
+       "minLength": 1,
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "consequence": {
+      "maxLength": 600,
+      "minLength": 1,
+      "type": "string"
+     },
+     "result_paths": {
+      "items": {
+       "format": "json-pointer",
+       "pattern": "^/result(/.*)?$",
+       "type": "string"
+      },
+      "type": "array"
+     },
+     "text": {
+      "maxLength": 600,
+      "minLength": 1,
+      "type": "string"
+     }
+    },
+    "required": [
+     "claim_ids",
+     "result_paths",
+     "text",
+     "consequence"
+    ],
+    "type": "object"
+   },
+   "maxItems": 20,
+   "type": "array"
+  }
+ },
+ "required": [
+  "schema_version",
+  "task_id",
+  "status",
+  "result",
+  "claims",
+  "warnings",
+  "assumptions",
+  "evidence"
+ ],
+ "title": "Q07 answer",
+ "type": "object"
+}

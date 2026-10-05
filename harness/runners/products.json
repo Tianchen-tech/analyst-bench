@@ -1,0 +1,148 @@
+{
+ "_doc": "Pilot-1 product configuration (ID-43). Frozen at preflight: binaries and versions, observed model identity, settings and the egress allowlist. Values marked TO_OBSERVE are filled from the controller's own observations at preflight, never from the agent's self-description.",
+ "opening_prompt": "Read task.md and use game.duckdb to complete the request. You may use SQL or Python. Write answer.json and memo.md in this directory, following the formats in task.md. You have 20 minutes from submission. Work independently; no follow-up answers will be provided. Use the provided files as the business evidence. Save any scripts or queries needed to reproduce your calculations in this directory.",
+ "time_limit_s": 1200,
+ "products": {
+  "Codex": {
+   "adapter": "codex_exec",
+   "binary": "/Applications/ChatGPT.app/Contents/Resources/codex-cli/bin/codex",
+   "install_root": "/Applications/ChatGPT.app/Contents/Resources/codex-cli",
+   "expected_version": "codex-cli 0.160.0",
+   "model": "gpt-6.1-sol",
+   "reasoning_effort": "high",
+   "profile_baseline": ".tools/profiles/codex",
+   "auth": "ChatGPT Plus subscription (codex login in the clean baseline profile); no OPENAI_API_KEY in the environment",
+   "egress_allowlist": [
+    "chatgpt.com",
+    "ab.chatgpt.com",
+    "auth.openai.com"
+   ],
+   "benchmark_overrides": [
+    "reasoning effort high (owner-confirmed, ID-43)",
+    "external sandbox: Codex's own sandbox bypassed inside the controller's sandbox-exec boundary",
+    "web search disabled",
+    "user config and rules ignored; session file kept only inside the disposable per-run home (copied as evidence)",
+    "1200 s external cap"
+   ],
+   "background_hosts": [
+    "*.oaiusercontent.com"
+   ]
+  },
+  "Claude Code": {
+   "adapter": "claude_code_print",
+   "binary": ".tools/claude-code/node_modules/@anthropic-ai/claude-code/bin/claude.exe",
+   "install_root": ".tools/claude-code",
+   "expected_version": "2.1.289 (Claude Code)",
+   "model": "claude-opus-5-5",
+   "reasoning_effort": "high",
+   "profile_baseline": ".tools/profiles/claude",
+   "auth": "Claude Pro subscription via `claude setup-token`; the token file is created by the owner and never printed; no ANTHROPIC_API_KEY in the environment",
+   "frozen_tool_allowlist": [
+    "Read",
+    "Write",
+    "Edit",
+    "Bash",
+    "Glob",
+    "Grep"
+   ],
+   "disallowed_tools": [
+    "WebSearch",
+    "WebFetch",
+    "CronCreate",
+    "CronDelete",
+    "CronList",
+    "RemoteTrigger",
+    "ScheduleWakeup",
+    "SendMessage"
+   ],
+   "egress_allowlist": [
+    "api.anthropic.com"
+   ],
+   "benchmark_overrides": [
+    "reasoning effort high (owner-confirmed, ID-43)",
+    "permission mode acceptEdits with a frozen tool allowlist",
+    "WebSearch/WebFetch and remote or scheduling tools (Cron*, RemoteTrigger, ScheduleWakeup, SendMessage) disallowed; native subagents (Task) left at the product default",
+    "no user settings sources; no session persistence",
+    "1200 s external cap"
+   ],
+   "background_hosts": []
+  },
+  "Grok Build": {
+   "adapter": "grok_build",
+   "binary": ".tools/grok-build/bin/grok",
+   "install_root": ".tools/grok-build",
+   "expected_version": "grok 1.0.40 (eb1a2256660d)",
+   "model": "grok-4.7",
+   "reasoning_effort": "high",
+   "profile_baseline": ".tools/profiles/grok",
+   "auth": "grok.com subscription (grok login with GROK_HOME=.tools/profiles/grok); no XAI_API_KEY in the environment",
+   "disallowed_tools": [
+    "web_search",
+    "web_fetch"
+   ],
+   "egress_allowlist": [
+    "cli-chat-proxy.grok.com",
+    "auth.x.ai"
+   ],
+   "benchmark_overrides": [
+    "reasoning effort high (owner, ID-49)",
+    "always-approve tool execution inside the controller's sandbox-exec boundary",
+    "web search and web fetch disabled",
+    "fresh GROK_HOME per run (credentials and bundled resources only); auto-update off",
+    "1200 s external cap"
+   ],
+   "background_hosts": [
+    "grok.com",
+    "api.mixpanel.com",
+    "api.x.ai"
+   ],
+   "served_model_aliases": [
+    "grok-4.7-build"
+   ]
+  },
+  "Antigravity": {
+   "adapter": "antigravity_cli",
+   "binary": ".tools/antigravity-cli/bin/antigravity",
+   "install_root": ".tools/antigravity-cli",
+   "expected_version": "1.2.16",
+   "model": "gemini-3.8-flash-high",
+   "reasoning_effort": "high",
+   "profile_baseline": ".tools/profiles/antigravity",
+   "auth": "Google account (Google AI Pro) via Antigravity CLI Google OAuth with HOME=.tools/profiles/antigravity; no GEMINI_API_KEY/GOOGLE_API_KEY in the environment",
+   "disallowed_tools": [
+    "search_web",
+    "read_url_content",
+    "browser_subagent",
+    "open_browser_url",
+    "read_browser_page",
+    "web_search",
+    "google_search"
+   ],
+   "egress_allowlist": [
+    "daily-cloudcode-pa.googleapis.com",
+    "cloudcode-pa.googleapis.com",
+    "oauth2.googleapis.com",
+    "www.googleapis.com",
+    "lh3.googleusercontent.com"
+   ],
+   "benchmark_overrides": [
+    "model gemini-3.8-flash-high (owner, ID-49)",
+    "toolPermission always-proceed with deny rules read_url(*), execute_url(*), mcp(*) inside the controller's sandbox-exec boundary",
+    "telemetry off; paid G1 credits off; no access outside the workspace",
+    "localhost network and /dev/ptmx allowed for the CLI's language server and terminal (SANDBOX_EXTRA)",
+    "fresh HOME per run (OAuth token, onboarding and project state, benchmark settings only)",
+    "1200 s external cap"
+   ],
+   "background_hosts": [
+    "antigravity-unleash.goog",
+    "play.googleapis.com"
+   ],
+   "permission_deny": [
+    "read_url(*)",
+    "execute_url(*)",
+    "mcp(*)"
+   ]
+  }
+ },
+ "_egress_doc": "Allowlists narrowed to the hosts each product actually used in the smoke runs (2026-10-03): Codex chatgpt.com, ab.chatgpt.com (+ auth.openai.com for token refresh); Claude Code api.anthropic.com. Codex's own *.oaiusercontent.com background requests stay denied and are recorded apart from agent access. Wave 2 (ID-49): Grok Build and Gemini CLI allowlists start from the inference and auth hosts and are narrowed or completed from their smoke runs. Grok Build smoke (2026-10-04): inference used only cli-chat-proxy.grok.com; grok.com (product requests), api.mixpanel.com (analytics) and api.x.ai stay denied as product background traffic, recorded apart from agent access; auth.x.ai kept for token refresh. Gemini CLI was dropped: Google rejects its personal-account client (IneligibleTierError UNSUPPORTED_CLIENT, 2026-10-04); the owner chose Antigravity CLI instead. Antigravity smoke 1 (2026-10-04): inference via daily-cloudcode-pa.googleapis.com; its account eligibility check needs www.googleapis.com/oauth2/v2/userinfo (allowed); antigravity-unleash.goog (feature flags) and play.googleapis.com (telemetry) stay denied as background. Antigravity smoke 2: the print-mode eligibility check also fails unless it can fetch the account's profile picture from lh3.googleusercontent.com (allowed; an image host, not a search or browsing endpoint)."
+}
