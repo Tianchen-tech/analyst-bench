@@ -1,4 +1,4 @@
-"""Stage 4: blind review packets and finalization (Pilot-1: owner review of all 36 outputs; no LLM judge; design 9.1).
+"""Blind review packets and finalization: original eligible AI panel plus versioned audit corrections.
 
 Packet: a reviewer PROJECTION (see `packet`): pseudonymous (HMAC of the run id with a private salt), identity terms
 masked in submitted content, neutral evidence aliases; the original archive and the redaction map stay apart. It carries the task request, the exact preserved answer.json bytes, memo.md, small evidence files, the
@@ -20,9 +20,12 @@ Review log (one JSON per pseudonym), required for finalization:
   target:     {"record_sha256", "pseudonym", "task_id"} of the provisional record this log decides (lineage)
   adjudications {ref: {"resolution": "automatic_verdict_upheld", "reason", "adjudicator", "rules_version"}} for disputes
 Wrong claims need taxonomy codes (E01-E17 or UNCLASSIFIED with a reason) and severity 1-3; warned=true needs a
-qualification_ref. A checkable claim makes the response substantive; a true critical predicate forces its atom to 0.
+qualification_ref, and r4 binds a claim-specific assessment to the source judgments. Recorded semantic objections
+require a versioned resolution even when normalized verdicts agree. A checkable claim makes the response substantive;
+a true critical predicate forces its atom to 0.
 Finalization computes the score (with caps), critical failure, success (core: >= 80 and no critical; Q26-Q28: >= 75 and
-no invented unavailable answer), E_i and S_i (design 5.4). Anything missing leaves the record pending, never "correct".
+no invented unavailable answer), E_i and S_i (design 5.4). A terminal failure keeps its content score but cannot succeed.
+Anything missing leaves the record pending, never "correct".
 """
 
 from __future__ import annotations
@@ -171,6 +174,16 @@ def _need(record: dict[str, Any]) -> dict[str, list[str]]:
             "caps": list((record["flags"].get("caps_review") or {}).keys())}
 
 
+def dispute_digest(disputes: list[Any]) -> str:
+    """Bind an adjudication to the exact original objections, including notes."""
+    return hashlib.sha256(json.dumps(disputes, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()).hexdigest()
+
+
+def delivery_success(content_success: bool, outcome: str | None) -> bool:
+    """Design 5.4: terminal failures do not succeed, even with saved good content."""
+    return bool(content_success and outcome not in ("timeout", "error", "infrastructure"))
+
+
 def finalize(record: dict[str, Any], log: dict[str, Any] | None, gold: dict[str, Any] | None = None) -> dict[str, Any]:
     """Return {status: final|pending, missing: [...], ...}. Never fills a missing decision with a default."""
     need = _need(record)
@@ -187,6 +200,13 @@ def finalize(record: dict[str, Any], log: dict[str, Any] | None, gold: dict[str,
         else:
             atoms[aid].update(awarded=float(dec["awarded"]), state="reviewed", reason=dec["reason"])
     claims, disputes = [], []
+    recorded_disputes = list(log.get("recorded_disputes") or log.get("disputes") or [])
+    if recorded_disputes:
+        adj = log.get("dispute_adjudication") or {}
+        if adj.get("resolution") != "versioned_review" or adj.get("source_disputes_sha256") != dispute_digest(recorded_disputes) \
+                or not all(str(adj.get(k, "")).strip() for k in ("reason", "adjudicator", "rules_version", "evidence_sha256")) \
+                or (record.get("gate") and adj.get("policy_record_sha256") != record["gate"].get("policy_record_sha256")):
+            missing.append("recorded disputes: needs a versioned adjudication bound to the original objections and current policy")
 
     def claim_problems(dec: dict[str, Any], verdict: str, where: str) -> list[str]:
         out = []
@@ -202,6 +222,18 @@ def finalize(record: dict[str, Any], log: dict[str, Any] | None, gold: dict[str,
             out.append(f"{where}: warned=true needs the specific qualification (warning index or memo quote)")
         return out
 
+    def qualification_problems(dec: dict[str, Any], verdict: str, key: str, text: Any) -> list[str]:
+        if verdict != "wrong" or dec.get("warned") is not True or record.get("gate", {}).get("rubric_version") != "r4":
+            return []
+        assessed = (log.get("qualification_reviews") or {}).get(key) or {}
+        digest = hashlib.sha256(json.dumps(text, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+        if assessed.get("qualifies") is not True or assessed.get("claim_sha256") != digest \
+                or assessed.get("qualification_ref") != dec.get("qualification_ref") \
+                or not all(str(assessed.get(k, "")).strip() for k in ("reason", "reviewer", "rules_version")) \
+                or assessed.get("rules_version") != "r4" or not assessed.get("source_review_hashes"):
+            return [f"{key}: warning needs a claim-specific qualification assessment bound to its text and source review"]
+        return []
+
     adjudications = log.get("adjudications") or {}
     for c in record["claims"]:
         dec = (log.get("claims") or {}).get(c["ref"])
@@ -209,13 +241,15 @@ def finalize(record: dict[str, Any], log: dict[str, Any] | None, gold: dict[str,
             missing.append(f"claim {c['ref']}")
             continue
         verdict = c["auto_verdict"] or dec["verdict"]
-        if c.get("auto_verdict") and dec["verdict"] in ("correct", "wrong") and dec["verdict"] != c["auto_verdict"]:
+        semantic = dec.get("semantic_verdict", dec["verdict"])
+        if c.get("auto_verdict") and semantic in VERDICTS and semantic != c["auto_verdict"]:
             disputes.append(c["ref"])
             adj = adjudications.get(c["ref"]) or {}
             if adj.get("resolution") != "automatic_verdict_upheld" or not all(str(adj.get(k, "")).strip() for k in ("reason", "adjudicator", "rules_version")):
                 missing.append(f"dispute {c['ref']}: needs a versioned adjudication (automatic arithmetic cannot be overridden; "
                                "a gold or matcher defect requires a versioned policy change)")
         missing += claim_problems(dec, verdict, f"claim {c['ref']}")
+        missing += qualification_problems(dec, verdict, c["ref"], c["text"])
         claims.append({"ref": c["ref"], "verdict": verdict, "warned": dec["warned"], "codes": dec.get("codes", []),
                        "severity": dec.get("severity"), "qualification_ref": dec.get("qualification_ref")})
     for m in log.get("memo_claims", []) or []:
@@ -223,6 +257,7 @@ def finalize(record: dict[str, Any], log: dict[str, Any] | None, gold: dict[str,
             missing.append("memo claim entry incomplete")
         else:
             missing += claim_problems(m, m["verdict"], f"memo claim {m['quote'][:40]!r}")
+            missing += qualification_problems(m, m["verdict"], "memo:" + hashlib.sha256(m["quote"].encode()).hexdigest(), m["quote"])
             claims.append({"ref": "memo", "quote": m["quote"], "verdict": m["verdict"], "warned": m["warned"],
                            "codes": m.get("codes", []), "severity": m.get("severity"), "qualification_ref": m.get("qualification_ref")})
     if log.get("memo_reviewed") is not True:
@@ -258,17 +293,22 @@ def finalize(record: dict[str, Any], log: dict[str, Any] | None, gold: dict[str,
         if val and aid in atoms and atoms[aid]["awarded"] not in (0, 0.0):
             missing.append(f"inconsistent: critical '{pred}' is true but atom {aid} was awarded points")
     if missing:
-        return {"status": "pending", "missing": missing, "disputes": disputes}
+        return {"status": "pending", "missing": missing, "disputes": disputes + recorded_disputes,
+                "automatic_disputes": disputes, "recorded_disputes": recorded_disputes}
     task = record["run"]["task_id"]
     raw = sum(a["awarded"] for a in atoms.values())
     score = min([raw, *caps.values()]) if caps else raw
     critical = any(crit.values())
     threshold = 80 if task in CORE else 75 if task in UNANSWERABLE else None
     wrong = [c for c in claims if c["verdict"] == "wrong"]
+    content_success = threshold is not None and score >= threshold and not critical
     return {"status": "final", "score": round(score, 6), "raw_score": round(raw, 6), "caps_applied": caps, "critical": crit,
-            "critical_failure": critical, "success": threshold is not None and score >= threshold and not critical,
+            "critical_failure": critical, "content_success": content_success,
+            "success": delivery_success(content_success, record["run"].get("outcome")),
             "substantive": log["substantive"], "E": int(bool(wrong)), "S": int(any(not c["warned"] for c in wrong)),
-            "wrong_claims": wrong, "atoms": list(atoms.values()), "disputes": disputes, "adjudications": adjudications, "traps": traps,
+            "wrong_claims": wrong, "atoms": list(atoms.values()), "disputes": disputes + recorded_disputes,
+            "automatic_disputes": disputes, "adjudications": adjudications, "traps": traps,
+            "recorded_disputes": recorded_disputes, "dispute_adjudication": log.get("dispute_adjudication"),
             "record_sha256": record.get("record_sha256"), "target": log.get("target"),
             "reviewer": log.get("reviewer"), "reviewed_at": log.get("reviewed_at")}
 

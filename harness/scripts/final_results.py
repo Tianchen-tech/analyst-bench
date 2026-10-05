@@ -11,6 +11,7 @@ ID-54 speed-adjusted score, time, repetition agreement and run notes. Writes pri
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import statistics
 import sys
@@ -27,10 +28,13 @@ PRODUCTS = ["Codex", "Claude Code", "Grok Build", "Antigravity"]
 SPEED_BONUS = 0.10                                          # ID-54
 
 
-def attempts_all() -> list[dict]:
+def attempts_all(revision: str | None = None) -> list[dict]:
     out = []
     for w, (runs, gdir) in WAVES.items():
-        for a in json.loads((ROOT / "private" / "grading" / gdir / "attempts.json").read_text()):
+        base = ROOT / "private" / "grading"
+        if revision:
+            base /= revision
+        for a in json.loads((base / gdir / "attempts.json").read_text()):
             a = dict(a, wave=w)
             rr = ROOT / "private" / "runs" / runs / "slots"
             rec = next((json.loads(p.read_text()) for p in rr.glob(f"*-{a['slot']['run_id']}/run_record.json")), None)
@@ -43,11 +47,13 @@ def attempts_all() -> list[dict]:
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--dataset", type=Path, required=True)
+    ap.add_argument("--revision", choices=("r4",))
     a = ap.parse_args()
     ident = gate(ROOT, a.dataset.resolve())
     salt = rv.salt(ROOT)
-    atts = attempts_all()
-    result = {"rubric_version": json.loads((ROOT / "private/grading/rubric.json").read_text())["rubric_version"], "versions": {}}
+    atts = attempts_all(a.revision)
+    result = {"rubric_version": json.loads((ROOT / "private/grading/rubric.json").read_text())["rubric_version"], "versions": {},
+              "gate": ident, "terminal_failure_policy": "timeout/error are unsuccessful; saved output keeps its content score"}
     trap_map = agg.trap_map(ROOT)
     for v in VERSIONS:
         finals = {}
@@ -57,13 +63,21 @@ def main() -> int:
             d = Path(att["dir"])
             rec = json.loads((d / "provisional.json").read_text())
             ps = json.loads((d / "packet.json").read_text())["pseudonym"]
-            log = json.loads((ROOT / "private" / "review" / "panel" / v / f"{ps}.json").read_text())
+            review_dir = ROOT / "private" / "review"
+            if a.revision:
+                review_dir /= a.revision
+            log_path = review_dir / "panel" / v / f"{ps}.json"
+            log = json.loads(log_path.read_text())
             rv.check_lineage(rec, log, ident, d / "archive", salt)        # raises on any mismatch
             gold = json.loads((ROOT / "private" / "gold" / f"{rec['run']['task_id']}.json").read_text())
             fin = rv.finalize(rec, log, gold)
             if fin["status"] != "final":
                 raise SystemExit(f"{att['slot']['run_id']} ({v}): not final: {fin.get('missing')}")
             fin["gate"] = ident
+            fin["log_sha256"] = hashlib.sha256(log_path.read_bytes()).hexdigest()
+            fin["content_success"] = fin.get("content_success", fin["success"])
+            fin["success"] = rv.delivery_success(fin["content_success"], att["outcome"])
+            fin["outcome"] = att["outcome"]
             rv.save(d / f"final_{v}.json", fin)
             finals[att["slot"]["run_id"]] = (fin, rec)
         per = {}
@@ -88,7 +102,7 @@ def main() -> int:
                 f = finals[x["slot"]["run_id"]][0]
                 per_task.setdefault(x["slot"]["task_id"], {})[f"r{x['slot']['repetition']}"] = {
                     "score": round(f["score"], 1), "success": f["success"], "critical": f["critical_failure"], "E": f["E"], "S": f["S"],
-                    "elapsed_s": x["elapsed"], "outcome": x["outcome"]}
+                    "content_success": f["content_success"], "elapsed_s": x["elapsed"], "outcome": x["outcome"]}
             same = sum(1 for t in per_task.values() if len(t) == 2 and t["r1"]["success"] == t["r2"]["success"])
             per[prod] = {"aggregate": {k: ag[k] for k in ("core_accuracy", "valid_abstention", "trap_recall", "silent_error_rate",
                                                          "silent_error_incidence_per_attempt", "conditional_silence_among_errors",
@@ -111,6 +125,13 @@ def main() -> int:
             notes.setdefault("antigravity_web_searches", 0)
             notes["antigravity_web_searches"] += o.get("web_search_count") or 0
     result["notes"] = notes
+    if a.revision:
+        manifest_path = ROOT / "private/review" / a.revision / "repair_manifest.json"
+        manifest = json.loads(manifest_path.read_text())
+        result["repair"] = {"manifest_sha256": hashlib.sha256(manifest_path.read_bytes()).hexdigest(),
+                            "outputs": manifest["outputs"], "new_contestant_runs": 0, "new_judge_calls": 0,
+                            "original_material_disagreement": len(manifest["material_disagreement"]["original_panel"]),
+                            "derived_material_disagreement": len(manifest["material_disagreement"]["derived_panel"])}
     out = ROOT / "private" / "results" / "pilot1_four_products.json"
     out.write_text(json.dumps(result, indent=1, ensure_ascii=False, default=str) + "\n")
     print(json.dumps({"written": str(out.relative_to(ROOT))}, indent=1))

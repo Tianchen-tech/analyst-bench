@@ -56,7 +56,7 @@ This document describes how Pilot-1 was run and scored. Decisions made during th
    - evidence paths must be submitted files or the provided inputs.
 2. **Automatic atoms:** structured metrics are mapped to the answer key through a typed alias matcher, which checks scope, horizon, denominator, unit and time window. Numbers are compared at fixed tolerances (USD to the cent, ratios to 1e-4, counts exactly). For the extract task, submitted SQL is replayed in a restricted sandbox (no network, no process creation, read-only data, time and memory limits).
 3. **Review items:** qualitative atoms (for example, "a conditional recommendation without unsupported causal claims"), every claim's verdict (correct, wrong, immaterial or unverifiable), whether a wrong claim was warned, critical errors, caps and trap detection. A value an agent reported outside the structured fields goes to review rather than counting as wrong.
-4. **Finalize:** score, caps, critical failure and success. Success means a score of at least 80 and no critical error for core tasks, and at least 75 and no invented answer for unanswerable tasks.
+4. **Finalize:** score, caps, critical failure and success. A successful delivery requires a completed outcome, a score of at least 80 with no critical error for core tasks, or at least 75 with no invented answer for unanswerable tasks. Timeout/error outputs keep their content scores but cannot succeed under the pre-registered design.
 5. **Aggregate** (per product):
    - core accuracy;
    - valid abstention;
@@ -77,14 +77,14 @@ This document describes how Pilot-1 was run and scored. Decisions made during th
   - no tools, web or subagents, in a fresh session each time.
 - **Validation:**
   - every judgment is checked for completeness and repaired at most twice;
-  - automatic arithmetic verdicts are kept, and a judge's disagreement with one is recorded as a dispute note.
+  - r4 retains the original semantic objection separately from effective arithmetic. Unresolved objections prevent finalization; a recorded versioned adjudication binds the exact original notes and current policy. Original judge-v1 calls and r3 records remain unchanged.
 - **Combination:**
-  - three judges: majority, with the median for points;
+  - three judges: majority, with the median for points; memo warnings also need affirmative support from a majority of the full eligible panel;
   - two judges: two versions:
     - **lenient:** the reading more favorable to the answer counts;
-    - **strict:** the less favorable reading counts.
+    - **strict:** the less favorable reading counts. Memo errors use the same intersection/union and any/all warning rules as structured claims.
   - Both versions are reported.
-- **Agreement:** material disagreement appeared in 38 of 72 answers, mostly about whether a claim is wrong or warned. Pass/fail differed in 4 answers.
+- **Agreement:** the repaired counter finds 41/72 original saved panels with material disagreements (rather than the r3 report's 38). The derived r4 panels have 40/72; these are different decision versions. Current lenient/strict delivery success differs in 1/72 attempts. Rule sensitivities are not statistical confidence intervals.
 
 ## 6. Decisions made during the pilot
 
@@ -99,5 +99,12 @@ This document describes how Pilot-1 was run and scored. Decisions made during th
 | Before wave 2 | Gemini CLI replaced by Antigravity CLI (Google rejects personal accounts for Gemini CLI); Antigravity's web search kept with disclosure | Toy preflights |
 | During wave 2 | Secondary speed-adjusted score, capped at +10% | Some wave-2 times, no wave-2 scores |
 | After all judging | Two-judge disagreement reported as lenient and strict | Disagreement counts by product, no scores |
+| October 5, after all results | r4 semantic identity, warning combination, recorded-dispute and terminal-outcome repair; all preserved outputs regraded | All original results and judgments |
 
-**Open point, not changed:** one Grok Build attempt hit the time cap. Its saved files scored 89–93, so it counts as a pass. The design text says terminal failures count as failures. Under that reading, Grok Build's core accuracy is 8/14 lenient and 7/14 strict.
+**Resolved in r4, after results were visible:** the timeout is an unsuccessful delivery. Content scores remain visible, and accuracy, throughput, repeat agreement and successful-time medians all use the same delivery-success predicate. All 72 preserved outputs were regraded uniformly; no new contestant or judge call was made.
+
+## 7. Scope of the r4 repair
+
+This correction is AI audit work, not a new blinded human assessment. Original eligible judgments are carried forward, and changes are recorded with their source hashes. Newly exposed partial-credit items use explicit archived evidence; unsupported supplementary claims are not called correct just because a spurious reference comparison was removed. Wrong scope remains a delivery error. The demonstrated unrelated rounding/gross warning does not qualify that scope error. Other qualitative judgments retain the original panel's limitations.
+
+The 49 corrected metric identities are covered by regressions across all 72 archived answers and 1,358 metrics. Original source files, 162 judgments, r3 finals and historical aggregates remain preserved. The current local scoring gate binds r4 modules, policy, references and runtime; the original collection bundle remains historical evidence of the conditions used when the agents ran.

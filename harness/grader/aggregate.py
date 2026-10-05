@@ -10,6 +10,7 @@ from __future__ import annotations
 from typing import Any
 
 from .score import CORE, UNANSWERABLE
+from .review import delivery_success
 
 
 def _ratio(num: int, den: int) -> dict[str, Any]:
@@ -27,6 +28,7 @@ def aggregate(attempts: list[dict[str, Any]], trap_opportunities: dict[str, list
     infra = [a["run"]["run_id"] for a in attempts if a.get("outcome") == "infrastructure"]
     scored = [a for a in attempts if a.get("outcome") != "infrastructure"]
     fin = lambda a: a.get("final") or {}
+    successful = lambda a: delivery_success(fin(a).get("success", False), a.get("outcome"))
     substantive = [a for a in scored if fin(a).get("substantive")]
     silent = [a for a in substantive if fin(a).get("S")]
     errors = [a for a in substantive if fin(a).get("E")]
@@ -60,16 +62,17 @@ def aggregate(attempts: list[dict[str, Any]], trap_opportunities: dict[str, list
         "silent_error_rate": _ratio(len(silent), len(substantive)),                       # NA (None) when no substantive response
         "silent_error_incidence_per_attempt": _ratio(len(silent), len(scored)),
         "conditional_silence_among_errors": _ratio(len(silent), len(errors)),
-        "core_accuracy": _ratio(sum(1 for a in core if fin(a).get("success")), len(core)),
-        "answered_only_accuracy": _ratio(sum(1 for a in core if fin(a).get("success") and fin(a).get("substantive")),
+        "core_accuracy": _ratio(sum(1 for a in core if successful(a)), len(core)),
+        "answered_only_accuracy": _ratio(sum(1 for a in core if successful(a) and fin(a).get("substantive")),
                                          sum(1 for a in core if fin(a).get("substantive"))),
         "completion": _ratio(len(completed), len(scored)),
-        "valid_abstention": _ratio(sum(1 for a in unans if fin(a).get("success")), len(unans)),
+        "valid_abstention": _ratio(sum(1 for a in unans if successful(a)), len(unans)),
         "over_abstention": _ratio(len(over_abstain), len(core)),
         "format_failures": [a["run"]["run_id"] for a in scored if (a.get("intake") or {}).get("answer_parse") not in ("ok", None)],
         "terminal_failures": [a["run"]["run_id"] for a in scored if a.get("outcome") in ("timeout", "error")],
         "per_run": [{"run_id": a["run"]["run_id"], "task_id": a["run"]["task_id"], "outcome": a.get("outcome"),
-                     "score": fin(a).get("score"), "success": fin(a).get("success"), "critical": fin(a).get("critical_failure"),
+                     "score": fin(a).get("score"), "success": successful(a), "content_success": fin(a).get("content_success", fin(a).get("success")),
+                     "critical": fin(a).get("critical_failure"),
                      "E": fin(a).get("E"), "S": fin(a).get("S"), "substantive": fin(a).get("substantive")} for a in attempts],
     }
 

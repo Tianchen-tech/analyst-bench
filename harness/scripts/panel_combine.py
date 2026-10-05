@@ -12,8 +12,8 @@ Stats are reported by the author's product, so the owner sees whether disagreeme
 from __future__ import annotations
 
 import argparse
+import copy
 import json
-import statistics
 import sys
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -31,14 +31,43 @@ def eligible(author: str) -> list[str]:
     return [j for j, prov in B.JUDGES.items() if prov != B.PROVIDER[author]]
 
 
-def load(item: dict) -> dict[str, dict]:
-    return {j: json.loads((PANEL / item["pseudonym"] / f"{j}.json").read_text()) for j in eligible(item["author"])
-            if (PANEL / item["pseudonym"] / f"{j}.json").exists()}
+def load(item: dict, panel_dir: Path = PANEL) -> dict[str, dict]:
+    return {j: json.loads((panel_dir / item["pseudonym"] / f"{j}.json").read_text()) for j in eligible(item["author"])
+            if (panel_dir / item["pseudonym"] / f"{j}.json").exists()}
+
+
+def _ordered_logs(logs: list[dict]) -> list[dict]:
+    """Stable provider order; anonymous fixtures get a stable content order."""
+    names = list(B.JUDGES)
+    def key(log):
+        name = (log.get("judge") or {}).get("judge", "")
+        return (names.index(name) if name in names else len(names), name,
+                json.dumps(log, sort_keys=True, ensure_ascii=False))
+    return sorted(logs, key=key)
+
+
+def _wrong_memo_groups(logs: list[dict]) -> list[list[tuple[int, int, dict]]]:
+    """Group existing wrong quotes with the existing judge quote matcher.
+
+    Retain every source entry, including its qualification, rather than copying
+    the first judge's warning decision. This does not adjudicate new claims.
+    """
+    groups: list[list[tuple[int, int, dict]]] = []
+    for li, log in enumerate(logs):
+        for mi, memo in enumerate(log.get("memo_claims") or []):
+            if memo.get("verdict") != "wrong":
+                continue
+            group = next((g for g in groups if J._same_quote(memo["quote"], g[0][2]["quote"])), None)
+            if group is None:
+                groups.append([(li, mi, memo)])
+            else:
+                group.append((li, mi, memo))
+    return groups
 
 
 def material_diffs(logs: dict[str, dict], pk: dict) -> tuple[list[str], list[str]]:
     n, mat, minor = J.needs(pk), [], []
-    L = list(logs.values())
+    L = _ordered_logs([dict(log, judge={"judge": name}) for name, log in logs.items()])
     for aid in n["atoms"]:
         vals = {round(float((l.get("atoms") or {}).get(aid, {}).get("awarded", -1)), 6) for l in L}
         if len(vals) > 1:
@@ -58,9 +87,13 @@ def material_diffs(logs: dict[str, dict], pk: dict) -> tuple[list[str], list[str
                 mat.append(f"{k} {name}")
     if len({l["substantive"] for l in L}) > 1:
         mat.append("substantive")
-    counts = [len([m for m in (l.get("memo_claims") or []) if m.get("verdict") == "wrong"]) for l in L]
-    if len({c > 0 for c in counts}) > 1:
+    groups = _wrong_memo_groups(L)
+    counts = [sum(m.get("verdict") == "wrong" for m in (l.get("memo_claims") or [])) for l in L]
+    if any(len({li for li, _, _ in g}) != len(L) for g in groups):
         mat.append(f"wrong memo claims {counts}")
+    for group in groups:
+        if len({m["warned"] for _, _, m in group}) > 1:
+            mat.append(f"memo warned? {group[0][2]['quote']}")
     return mat, minor
 
 
@@ -98,6 +131,9 @@ def _pick_wrong(ds: list[dict], strict: bool) -> dict:
 
 def combine_two(logs: list[dict], pk: dict, strict: bool) -> dict:
     """ID-55: lenient = benefit of the doubt from either judge; strict = any judge's objection counts."""
+    if not logs:
+        raise ValueError("at least one judgment is required")
+    logs = _ordered_logs(logs)
     n = J.needs(pk)
     out = {"atoms": {}, "claims": {}, "memo_claims": [], "memo_reviewed": True, "critical": {}, "caps": {}, "traps": {},
            "disputes": sorted({d for l in logs for d in (l.get("disputes") or [])})}
@@ -118,46 +154,62 @@ def combine_two(logs: list[dict], pk: dict, strict: bool) -> dict:
         vals = [l["traps"][t] for l in logs]
         out["traps"][t] = all(vals) if strict else any(vals)
     out["substantive"] = any(l["substantive"] for l in logs)
-    memos = [[m for m in (l.get("memo_claims") or []) if m.get("verdict") == "wrong"] for l in logs]
-    if strict:
-        for ms in memos:
-            for m in ms:
-                if not any(J._same_quote(m["quote"], o["quote"]) for o in out["memo_claims"]):
-                    out["memo_claims"].append(m)
-    else:
-        for m in memos[0]:
-            if all(any(J._same_quote(m["quote"], o["quote"]) for o in other) for other in memos[1:]):
-                out["memo_claims"].append(m)
+    for group in _wrong_memo_groups(logs):
+        if not strict and len({li for li, _, _ in group}) != len(logs):
+            continue
+        memo = copy.deepcopy(group[0][2])
+        memo.pop("qualification_ref", None)
+        memo.update(_pick_wrong([m for _, _, m in group], strict))
+        memo["panel_sources"] = [{"judge": (logs[li].get("judge") or {}).get("judge"),
+                                  "memo_index": mi, "claim": copy.deepcopy(m)} for li, mi, m in group]
+        out["memo_claims"].append(memo)
     return out
 
 
-def combine() -> dict:
+def combine_logs(logs: dict[str, dict], pk: dict, variant: str) -> dict:
+    """Pure panel combination for original or separately derived judgments.
+
+    Three eligible judges retain the existing majority rule. Two judges use
+    ID-55; raw judgment files, target metadata and directory layout are untouched.
+    """
+    if variant not in ("lenient", "strict"):
+        raise ValueError(f"unknown panel variant: {variant}")
+    if not logs:
+        raise ValueError("at least one judgment is required")
+    ordered = _ordered_logs([dict(copy.deepcopy(log), judge={"judge": name},
+                                 disputes=[d if isinstance(d, str) else json.dumps(d, ensure_ascii=False)
+                                           for d in (log.get("disputes") or [])]) for name, log in logs.items()])
+    if len(ordered) < 3:
+        return combine_two(ordered, pk, strict=(variant == "strict"))
+    log, unresolved = J.consensus(ordered, pk)
+    for u in unresolved:
+        if not u.startswith("claim "):
+            raise ValueError(f"no majority on {u}")
+        ref = u.split(" ", 2)[1].rstrip(":")
+        log["claims"][ref] = _pick_wrong([l["claims"][ref] for l in ordered], strict=(variant == "strict"))
+        log.setdefault("panel_notes", []).append(f"{ref}: three-way split resolved by the {variant} rule")
+    return log
+
+
+def combine(*, items: list[dict] | None = None, panel_dir: Path = PANEL, output_dir: Path = LOGS) -> dict:
     out = {"lenient": 0, "strict": 0}
-    for it in packets(["1", "2"]):
-        logs = load(it)
+    for it in packets(["1", "2"]) if items is None else items:
+        logs = load(it, panel_dir)
         need = eligible(it["author"])
         if len(logs) < len(need):
             raise SystemExit(f"{it['pseudonym']}: missing judgments {sorted(set(need) - set(logs))}")
         pk = it["packet"]
-        ordered = [dict(logs[j], disputes=[d if isinstance(d, str) else json.dumps(d, ensure_ascii=False)
-                                           for d in (logs[j].get("disputes") or [])]) for j in need]
         for variant in ("lenient", "strict"):
-            if len(ordered) >= 3:                                   # three judges: majority (median points) in both versions
-                log, unresolved = J.consensus(ordered, pk)
-                for u in unresolved:                                # a three-way split: the variant's two-judge rule
-                    if not u.startswith("claim "):
-                        raise SystemExit(f"{it['pseudonym']}: no majority on {u}")
-                    ref = u.split(" ", 2)[1].rstrip(":")
-                    log["claims"][ref] = _pick_wrong([l["claims"][ref] for l in ordered], strict=(variant == "strict"))
-                    log.setdefault("panel_notes", []).append(f"{ref}: three-way split resolved by the {variant} rule")
-            else:
-                log = combine_two(ordered, pk, strict=(variant == "strict"))
+            try:
+                log = combine_logs(logs, pk, variant)
+            except ValueError as exc:
+                raise SystemExit(f"{it['pseudonym']}: {exc}") from exc
             log["target"] = {"record_sha256": pk["record_sha256"], "pseudonym": it["pseudonym"], "task_id": pk["task_id"]}
             log["reviewer"] = (f"LLM judge panel (ID-50), leave-own-provider-out: {', '.join(need)}; "
                                + ("majority of three" if len(need) >= 3 else f"{variant} combination of two (ID-55)"))
             log["panel"] = {"judges": need, "variant": variant,
-                            "judgment_sha256": {j: J.sha((PANEL / it['pseudonym'] / f'{j}.json').read_bytes()) for j in need}}
-            d = LOGS / variant
+                            "judgment_sha256": {j: J.sha((panel_dir / it['pseudonym'] / f'{j}.json').read_bytes()) for j in need}}
+            d = output_dir / variant
             d.mkdir(parents=True, exist_ok=True)
             (d / f"{it['pseudonym']}.json").write_text(json.dumps(log, indent=1, ensure_ascii=False) + "\n", encoding="utf-8")
             out[variant] += 1

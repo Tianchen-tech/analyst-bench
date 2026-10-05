@@ -1,0 +1,365 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Analyst Bench Error Patterns</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: companion to the Pilot-1 results scoreboard, same tokens. Thesis and four headline counts, then the
+   72-answer map (outcome per answer), the five patterns as case files that highlight their answers on the map,
+   the error-label matrix, where errors hide in passing answers, and the review checklist. */
+:root{
+  --bg:#f3f5f7; --panel:#ffffff; --ink:#18202a; --muted:#5c6876; --line:#dfe4ea; --soft:#eef1f5;
+  --accent:#0f7c86; --accent-ink:#ffffff;
+  --good:#1f8a5b; --warn:#b7791f; --bad:#c2453b;
+  --good-bg:#d7ecdf; --warn-bg:#f6e3bf; --bad-bg:#f7d9d4;
+  --p1:#4b55c8; --p2:#c4622d; --p3:#3f4752; --p4:#1d8a74;
+  --display:"Bricolage Grotesque","IBM Plex Sans",sans-serif;
+  --body:"IBM Plex Sans",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#11161c; --panel:#18202a; --ink:#e7ecf1; --muted:#97a3b0; --line:#2a3440; --soft:#1f2833;
+  --accent:#3fb6be; --accent-ink:#0b1216;
+  --good:#4cc08a; --warn:#e0a84a; --bad:#ef7a6f;
+  --good-bg:#21402f; --warn-bg:#4a3d1f; --bad-bg:#4a2723;
+  --p1:#8b93f0; --p2:#ec9663; --p3:#b8c1cc; --p4:#4fc2a9; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#11161c; --panel:#18202a; --ink:#e7ecf1; --muted:#97a3b0; --line:#2a3440; --soft:#1f2833;
+  --accent:#3fb6be; --accent-ink:#0b1216;
+  --good:#4cc08a; --warn:#e0a84a; --bad:#ef7a6f;
+  --good-bg:#21402f; --warn-bg:#4a3d1f; --bad-bg:#4a2723;
+  --p1:#8b93f0; --p2:#ec9663; --p3:#b8c1cc; --p4:#4fc2a9; color-scheme:dark}
+*{box-sizing:border-box}
+html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--body);margin:0}
+a{color:var(--accent)}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:28px 48px;display:grid;gap:22px}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+h1{font-size:clamp(28px,4.2vw,44px);line-height:1.05;letter-spacing:-.01em;font-weight:700;max-width:22ch}
+h2{font-size:20px;font-weight:700}
+h3{font-size:18px;font-weight:700}
+.eyebrow{font:600 12px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+.lede{color:var(--muted);max-width:68ch;margin:10px 0 0}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+header{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;justify-content:space-between}
+header>div{min-width:0}
+.links{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;margin-top:12px}
+.toggle{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--panel);gap:2px}
+.toggle button{font:600 13px var(--body);border:0;background:transparent;color:var(--muted);padding:7px 14px;border-radius:999px;cursor:pointer}
+.toggle button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+button:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.vnote{font-size:12.5px;color:var(--muted);margin-top:6px;max-width:44ch}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;gap:6px;align-content:start}
+.stat b{font:700 36px/1 var(--display);font-variant-numeric:tabular-nums}
+.stat b small{font:500 16px var(--display);color:var(--muted)}
+.stat span{font-size:13px;color:var(--muted)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:12px;min-width:0}
+.panel .head{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;justify-content:space-between}
+.sub{margin:0;color:var(--muted);font-size:13px;max-width:72ch}
+.scroll{overflow-x:auto}
+.legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:12px;color:var(--muted);align-items:center}
+.sw{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-3px;margin-right:5px;border:1px solid var(--line)}
+/* answer map */
+.map{border-collapse:separate;border-spacing:3px;font-size:12px}
+.map th{font:600 11px var(--mono);color:var(--muted);text-align:center;padding:2px 0;white-space:nowrap}
+.map th.task{border-bottom:1px solid var(--line)}
+.map td.prod{font:600 13px var(--body);padding-right:8px;white-space:nowrap;border-left:4px solid var(--pc);padding-left:8px}
+.map td.cell{width:30px;height:30px;border-radius:6px;text-align:center;font:600 10.5px var(--mono);position:relative;transition:opacity .2s}
+.cell.ok{background:var(--good-bg);color:var(--good)}
+.cell.flag{background:var(--warn-bg);color:var(--warn)}
+.cell.fail{background:var(--bad-bg);color:var(--bad)}
+.cell.silent::after{content:"";position:absolute;top:4px;right:4px;width:6px;height:6px;border-radius:50%;background:currentColor}
+.map.focus td.cell{opacity:.18}
+.map.focus td.cell.hit{opacity:1;outline:2px solid var(--ink);outline-offset:-2px}
+.mapnote{font-size:12.5px;color:var(--muted);min-height:1.5em}
+/* patterns */
+.patterns{display:grid;gap:14px}
+.pattern{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:14px;min-width:0}
+.pattern .top{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;justify-content:space-between}
+.pattern .top>div{min-width:0}
+.tag{font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.cols{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr) minmax(0,.9fr);gap:16px}
+.cols>div{min-width:0;display:grid;gap:8px;align-content:start}
+.cols h4{margin:0;font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase}
+.cols h4.bad{color:var(--bad)} .cols h4.good{color:var(--good)} .cols h4.acc{color:var(--accent)}
+.cols p{margin:0;font-size:14px}
+blockquote{margin:0;padding:8px 12px;border-left:3px solid var(--line);background:var(--soft);border-radius:0 8px 8px 0;font-size:13.5px}
+blockquote cite{display:block;margin-top:4px;font:12px var(--mono);font-style:normal;color:var(--muted)}
+.who{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:5px;font:600 11.5px var(--mono);padding:3px 8px;border-radius:999px;background:var(--soft);color:var(--ink)}
+.pill i{width:8px;height:8px;border-radius:50%;background:var(--pc)}
+.show{font:600 12.5px var(--body);border:1px solid var(--line);background:var(--panel);color:var(--accent);padding:6px 12px;border-radius:999px;cursor:pointer;white-space:nowrap}
+.show[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+/* matrix + bars */
+.grid2{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:14px}
+table.mx{border-collapse:collapse;width:100%;font-size:13px}
+.mx th,.mx td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+.mx th{font:600 11px var(--mono);letter-spacing:.04em;color:var(--muted);text-transform:uppercase}
+.mx th.p{text-align:center;color:var(--ink);text-transform:none;font:600 12.5px var(--body);border-bottom:3px solid var(--pc)}
+.mx td.code{font:600 12px var(--mono)} .mx td.code span{display:block;font:12px var(--body);color:var(--muted);white-space:normal;min-width:160px}
+.mx td.v{text-align:center;font:600 12.5px var(--mono);font-variant-numeric:tabular-nums}
+.mx tr.total td{border-top:2px solid var(--line)}
+.bars{display:grid;gap:12px}
+.brow{display:grid;grid-template-columns:104px minmax(0,1fr);gap:10px;align-items:center;font-size:13px}
+.brow .name{font-weight:600;border-left:4px solid var(--pc);padding-left:8px}
+.stack{display:flex;height:22px;border-radius:6px;overflow:hidden;background:var(--soft)}
+.stack span{display:flex;align-items:center;justify-content:center;font:600 11px var(--mono);min-width:0;overflow:hidden}
+.stack .s-ok{background:var(--good-bg);color:var(--good)}
+.stack .s-flag{background:var(--warn-bg);color:var(--warn)}
+.stack .s-fail{background:var(--bad-bg);color:var(--bad)}
+.checks{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:12px;margin:0;padding:0;list-style:none}
+.checks li{border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:13.5px;display:grid;gap:4px}
+.checks b{font:700 15px var(--display)}
+.callout{border:1px solid var(--accent);border-radius:14px;padding:16px 18px;background:var(--panel);display:grid;gap:6px}
+.callout p{margin:0;font-size:14px;max-width:85ch}
+details{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px}
+summary{cursor:pointer;font:700 16px var(--display)}
+details ul{margin:10px 0 0;padding-left:20px;display:grid;gap:6px;color:var(--muted);font-size:13.5px;max-width:90ch}
+footer{color:var(--muted);font-size:12px}
+@media (max-width:980px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.cols,.grid2{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:520px){.stats{grid-template-columns:minmax(0,1fr)}.brow{grid-template-columns:84px minmax(0,1fr)}}
+@media (prefers-reduced-motion:reduce){.map td.cell{transition:none}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="eyebrow">Analyst Bench · Pilot-1 · Error patterns</div>
+      <h1>Finding a data problem is not the same as respecting it</h1>
+      <p class="lede">Across 72 answers from four AI analyst agents, the serious errors were rarely bad arithmetic. They were conclusions that went past the evidence: the right analysis of the wrong population, a causal effect claimed from an experiment the agent had just called invalid, a customer's motive invented from a payment log, a budget forecast read off historical averages.</p>
+      <div class="links"><a href="index.html">Results dashboard</a><a href="https://github.com/Tianchen-tech/analyst-bench/blob/main/FINDINGS.md">Full written report</a><a href="https://github.com/Tianchen-tech/analyst-bench">Repository</a></div>
+    </div>
+    <div>
+      <div class="toggle" role="group" aria-label="Judge disagreement rule">
+        <button id="v-lenient" aria-pressed="true" data-v="lenient">Lenient</button>
+        <button id="v-strict" aria-pressed="false" data-v="strict">Strict</button>
+      </div>
+      <div class="vnote" id="vnote"></div>
+    </div>
+  </header>
+
+  <section class="stats" id="stats" aria-label="Headline counts"></section>
+
+  <section class="panel">
+    <div class="head">
+      <h2>All 72 answers</h2>
+      <div class="legend">
+        <span><i class="sw" style="background:var(--good-bg)"></i>Passed, no wrong claim</span>
+        <span><i class="sw" style="background:var(--warn-bg)"></i>Passed, with a wrong claim</span>
+        <span><i class="sw" style="background:var(--bad-bg)"></i>Failed</span>
+        <span><i class="sw" style="background:var(--soft);position:relative"></i>Dot: a wrong claim had no specific warning</span>
+      </div>
+    </div>
+    <p class="sub">One cell per answer, labelled by run (1 or 2). Amber cells are the ones a score alone would wave through. Use “Show on map” on any pattern below to highlight the answers it describes.</p>
+    <div class="scroll"><table class="map" id="map"></table></div>
+    <div class="mapnote" id="mapnote" aria-live="polite"></div>
+  </section>
+
+  <section class="patterns" id="patterns" aria-label="Five recurring patterns"></section>
+
+  <section class="grid2">
+    <div class="panel">
+      <div class="head"><h2>Error labels by product</h2><span class="tag">answers of 18</span></div>
+      <p class="sub">Answers with at least one claim carrying each taxonomy label, as assigned by the cross-vendor judges. Labels overlap, so rows do not add up.</p>
+      <div class="scroll"><table class="mx" id="mx"></table></div>
+    </div>
+    <div class="panel">
+      <div class="head"><h2>Where passing answers go wrong</h2></div>
+      <p class="sub">Each bar is one product's 18 answers. Amber is the share a pass/fail score would miss.</p>
+      <div class="bars" id="bars"></div>
+      <p class="sub" id="where"></p>
+    </div>
+  </section>
+
+  <section class="panel">
+    <div class="head"><h2>The evaluator made pattern 1 too</h2></div>
+    <p class="sub" style="max-width:90ch">Before the r4 correction, the automatic matcher compared numbers with the right shape but the wrong identity: an account median against a mean, active users against all assigned users, a later small purchase against the original refunded payment. Correct supplementary numbers were marked as errors. The audit found this, fixed it, and regraded all 72 answers. A matching number only means something after the population, statistic, event and time window match.</p>
+  </section>
+
+  <section class="panel">
+    <div class="head"><h2>What a human reviewer should check</h2></div>
+    <ul class="checks">
+      <li><b>Scope of the deliverable</b>Population, time window, denominator and level of aggregation, compared with the request. Running code is not evidence of answering the right question.</li>
+      <li><b>Claims after a validity flag</b>Once the agent calls an experiment broken or confounded, every later effect, loss or lift needs to be reframed as descriptive or dropped.</li>
+      <li><b>Every “why”</b>Each motive, root cause or system-health statement needs a source table. Otherwise it is a hypothesis and should say so.</li>
+      <li><b>Forecasts and budgets</b>“A did better than B” does not mean “moving money to A returns X”. Look for evidence about the margin: a test, a lift study, a saturation curve.</li>
+      <li><b>The memo</b>Most wrong claims in passing answers were in the prose. A caveat counts only if it names the claim it qualifies.</li>
+    </ul>
+  </section>
+
+  <section class="callout">
+    <h2>Running these tasks yourself</h2>
+    <p>The tasks, results and these error cases are public, so an agent with web access could find what each task tests. Turn off web search and URL fetching for the agent, and ideally allow network access only to the model's own inference endpoint, as the Pilot-1 harness did. If a product's server-side search cannot be switched off, record and report every search it makes. Treat any new scores as a fresh run on known tasks, not as a continuation of Pilot-1.</p>
+  </section>
+
+  <details>
+    <summary>Limitations</summary>
+    <ul>
+      <li>Nine tasks on one synthetic dataset, two runs per product. These are case observations about the workflow, not product ratings or statistical estimates, and they say nothing about model internals or training.</li>
+      <li>Labels come from AI judges, who disagreed materially on 41 of 72 original panels, and from a documented post-results audit (scorer r4). Lenient and strict show sensitivity to the combination rule; they are not confidence intervals.</li>
+      <li>The Q14 request does not say whether week 6 means calendar-week revenue or the week-6 registration cohort. A cohort reading is defensible, and the task needs rewording before reuse.</li>
+      <li>This pilot did not test whether people would notice these errors.</li>
+      <li>Quotes are from the agents' saved answers. Numbers that would reveal the answer key are omitted.</li>
+    </ul>
+  </details>
+
+  <footer>Analyst Bench · Pilot-1 · Figures from the grader output (scorer r4). This page contains no reference answers.</footer>
+</div>
+
+<script>
+const DATA = {"lenient":{"Codex":{"Q12":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q03":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q07":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q14":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q26":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q27":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q16":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q17":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q04":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]}},"Claude Code":{"Q12":{"r1":[1,0,0,[],[],92.9],"r2":[1,1,0,["E08","E16"],["claim","memo"],89.3]},"Q03":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q07":{"r1":[1,0,0,[],[],100.0],"r2":[0,1,1,["E12","E17"],["claim","memo","metric"],0.0]},"Q14":{"r1":[0,1,0,["E05","E07","E14","E17"],["claim"],25.0],"r2":[0,1,1,["E05","E14","E16","E17"],["claim"],25.0]},"Q26":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q27":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q16":{"r1":[1,0,0,[],[],100.0],"r2":[0,0,0,[],[],75.0]},"Q17":{"r1":[1,1,0,["E08"],["memo"],100.0],"r2":[1,1,0,["E08","E09"],["claim","memo"],100.0]},"Q04":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]}},"Grok Build":{"Q12":{"r1":[1,1,1,["E13","E14"],["claim","memo"],88.1],"r2":[0,0,0,[],[],93.0]},"Q03":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q07":{"r1":[0,1,1,["E03"],["claim","metric"],40.0],"r2":[0,1,1,["E17"],["claim","memo"],26.7]},"Q14":{"r1":[0,1,1,["E02","E16"],["claim"],50.0],"r2":[0,0,0,[],[],50.0]},"Q26":{"r1":[0,1,0,["E12","E14"],["claim","memo"],50.0],"r2":[1,0,0,[],[],75.0]},"Q27":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q16":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q17":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q04":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]}},"Antigravity":{"Q12":{"r1":[0,1,1,["E06","E08","E12","E14","E17"],["claim","memo"],74.7],"r2":[0,1,1,["E08","E12","E14","E16","E17"],["claim","memo","metric"],74.7]},"Q03":{"r1":[1,1,1,["E14","E17"],["memo"],100.0],"r2":[1,1,1,["E11","E14"],["memo"],100.0]},"Q07":{"r1":[1,1,1,["E10","E14"],["claim","memo"],100.0],"r2":[1,1,1,["E03","E12","E14"],["memo"],100.0]},"Q14":{"r1":[0,1,1,["E03","E10","E13","E14","E17"],["claim","memo","metric"],50.0],"r2":[0,1,1,["E03","E10","E12","E14","E16","E17"],["claim","memo","metric"],75.0]},"Q26":{"r1":[0,1,1,["E12","E13","E14","E17"],["claim","memo"],50.0],"r2":[0,1,1,["E12","E13","E14"],["claim","memo"],50.0]},"Q27":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q16":{"r1":[1,1,0,["E14","E17"],["claim","memo"],90.0],"r2":[0,1,1,["E14","E17"],["claim"],75.0]},"Q17":{"r1":[0,1,1,["E07","E08","E09","E10","E14","E17"],["claim","memo"],77.5],"r2":[0,1,1,["E08","E09","E13","E14"],["claim","memo"],77.0]},"Q04":{"r1":[1,0,0,[],[],100.0],"r2":[1,1,1,["E08","E12","E14","E16"],["memo"],100.0]}}},"strict":{"Codex":{"Q12":{"r1":[1,0,0,[],[],96.0],"r2":[1,0,0,[],[],96.0]},"Q03":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q07":{"r1":[1,0,0,[],[],100.0],"r2":[1,1,1,["E14"],["claim","memo"],80.0]},"Q14":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q26":{"r1":[1,0,0,[],[],95.0],"r2":[1,0,0,[],[],95.0]},"Q27":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q16":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q17":{"r1":[1,0,0,[],[],100.0],"r2":[1,1,1,["E08","E14"],["claim","memo"],100.0]},"Q04":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]}},"Claude Code":{"Q12":{"r1":[1,1,1,["E08","E13","E14","E16"],["claim"],92.9],"r2":[1,1,1,["E08","E14","E16"],["claim","memo","metric"],89.3]},"Q03":{"r1":[1,1,1,["E02","E14"],["memo"],100.0],"r2":[1,0,0,[],[],100.0]},"Q07":{"r1":[1,1,1,["E07","E16"],["memo"],100.0],"r2":[0,1,1,["E12","E17"],["claim","memo","metric"],0.0]},"Q14":{"r1":[0,1,1,["E03","E05","E07","E09","E14","E17"],["claim","memo"],25.0],"r2":[0,1,1,["E05","E07","E12","E14","E16","E17"],["claim","memo","metric"],12.5]},"Q26":{"r1":[1,1,1,["E13"],["claim"],95.0],"r2":[1,0,0,[],[],100.0]},"Q27":{"r1":[1,0,0,[],[],100.0],"r2":[1,1,1,["E10","E14"],["claim","memo"],100.0]},"Q16":{"r1":[1,0,0,[],[],100.0],"r2":[0,0,0,[],[],75.0]},"Q17":{"r1":[1,1,0,["E08"],["memo"],100.0],"r2":[1,1,1,["E08","E09","E14"],["claim","memo"],100.0]},"Q04":{"r1":[1,1,1,["E14","E17"],["memo"],100.0],"r2":[1,0,0,[],[],100.0]}},"Grok Build":{"Q12":{"r1":[1,1,1,["E13","E14"],["claim","memo"],86.0],"r2":[0,1,1,["E07","E13","E14"],["claim","memo"],89.3]},"Q03":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q07":{"r1":[0,1,1,["E03","E14"],["claim","memo","metric"],33.3],"r2":[0,1,1,["E17"],["claim","memo"],26.7]},"Q14":{"r1":[0,1,1,["E02","E16"],["claim"],50.0],"r2":[0,1,1,["E14"],["claim","memo"],50.0]},"Q26":{"r1":[0,1,1,["E12","E14"],["claim","memo"],50.0],"r2":[1,1,1,["E07","E14"],["memo"],75.0]},"Q27":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q16":{"r1":[1,1,1,["E14"],["claim"],100.0],"r2":[0,0,0,[],[],75.0]},"Q17":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q04":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]}},"Antigravity":{"Q12":{"r1":[0,1,1,["E06","E08","E12","E14","E17"],["claim","memo"],74.7],"r2":[0,1,1,["E08","E12","E14","E16","E17"],["claim","memo","metric"],74.7]},"Q03":{"r1":[1,1,1,["E14","E17"],["memo"],100.0],"r2":[1,1,1,["E11","E14"],["memo"],100.0]},"Q07":{"r1":[1,1,1,["E10","E14"],["claim","memo"],100.0],"r2":[1,1,1,["E03","E12","E14"],["memo"],100.0]},"Q14":{"r1":[0,1,1,["E03","E10","E13","E14","E17"],["claim","memo","metric"],50.0],"r2":[0,1,1,["E03","E10","E12","E14","E16","E17"],["claim","memo","metric"],75.0]},"Q26":{"r1":[0,1,1,["E12","E13","E14","E17"],["claim","memo"],50.0],"r2":[0,1,1,["E12","E13","E14"],["claim","memo"],50.0]},"Q27":{"r1":[1,0,0,[],[],100.0],"r2":[1,0,0,[],[],100.0]},"Q16":{"r1":[1,1,0,["E14","E17"],["claim","memo"],90.0],"r2":[0,1,1,["E14","E17"],["claim"],75.0]},"Q17":{"r1":[0,1,1,["E07","E08","E09","E10","E14","E17"],["claim","memo"],77.5],"r2":[0,1,1,["E08","E09","E13","E14"],["claim","memo"],77.0]},"Q04":{"r1":[1,0,0,[],[],100.0],"r2":[1,1,1,["E08","E12","E14","E16"],["memo"],100.0]}}}};
+const PRODUCTS = [["Codex","var(--p1)"],["Claude Code","var(--p2)"],["Grok Build","var(--p3)"],["Antigravity","var(--p4)"]];
+const TASKS = ["Q03","Q04","Q07","Q12","Q14","Q16","Q17","Q26","Q27"];
+const CODES = {E14:"Fabrication or unsupported certainty",E17:"Metric or decision mismatch",E12:"Root-cause conflation",E08:"Confounding or composition",
+  E16:"Evidence and communication mismatch",E13:"Proxy or identity overclaim",E03:"Accounting scope",E10:"Censoring or leakage",
+  E09:"Experiment validity",E07:"Concentration and distribution",E05:"Time semantics",E02:"Entity identity",E06:"Data availability",E11:"Seasonality or baseline"};
+const PATTERNS = [
+  {name:"A complete analysis of the wrong population", tasks:"Q07",
+   what:"Q07 asks for one server's weekly bookings. Three answers cleaned the data well, reproduced exactly, and delivered totals for every server.",
+   quote:"All servers; player accounts; succeeded payments deduplicated by payment_id", cite:"Grok Build, Q07 run 2, label on its own metrics",
+   good:"Codex and Antigravity delivered the requested server in all four of their runs.",
+   check:"Compare the deliverable's population and aggregation level with the request, not only whether the code runs.",
+   cases:[["Grok Build","Q07","r1"],["Grok Build","Q07","r2"],["Claude Code","Q07","r2"]]},
+  {name:"Calling an experiment invalid, then claiming its effect", tasks:"Q17",
+   what:"Both Antigravity runs correctly found that the price test's allocation was broken, then stratified, ran a regression and reported the result as a causal effect. One Claude Code memo stated a lift as fact.",
+   quote:"Offer B should not be shipped because the experimental outcome is an artifact of selection bias and actually causes a 37.1% monetization loss among historical payers.", cite:"Antigravity, Q17 run 2",
+   good:"Codex and Grok Build passed all four runs and declined to ship without claiming the true effect: “Do not ship offer B based on this test; retain A and rerun after resolving assignment integrity.” (Codex)",
+   check:"After a validity flag, reread every sentence that states an effect, a loss or a lift.",
+   cases:[["Antigravity","Q17","r1"],["Antigravity","Q17","r2"],["Claude Code","Q17","r2"]]},
+  {name:"A story built from behavioral records", tasks:"Q26 · Q12",
+   what:"The warehouse has payments, refunds with a generic reason code, logins and client versions. It has no support tickets, crash logs or satisfaction data. Answers supplied motives, support conversations and system status anyway, or ruled a cause out with the same unearned certainty.",
+   quote:"Customer support's handling successfully retained a high-value customer through a fair, partial-refund compromise.", cite:"Antigravity, Q26 run 2",
+   good:"Codex and Claude Code passed all four Q26 runs: “The data cannot tell us why this customer asked for the refund, so it also cannot say whether event rewards were the reason.” (Claude Code)",
+   check:"For each “why”, ask which table it came from. Behavior can suggest a hypothesis, not a motive.",
+   cases:[["Antigravity","Q26","r1"],["Antigravity","Q26","r2"],["Grok Build","Q26","r1"],["Antigravity","Q12","r1"],["Antigravity","Q12","r2"]]},
+  {name:"Historical averages turned into a budget forecast", tasks:"Q16",
+   what:"Every product got Q16's descriptive comparison right at least once. The answers differed in what they claimed the numbers mean for future spend.",
+   quote:"Allocating budget using aggregate S02 figures would misallocate capital from B to A, reducing net cash returns by … per dollar shifted across every territory.", cite:"Antigravity, Q16 run 2 (amount omitted)",
+   good:"Same numbers, bounded claim: “Treat B as the stronger candidate for a controlled incremental budget test, not a proven causal winner or a guaranteed scalable return.” (Codex)",
+   check:"A move from “A did better” to “moving money to A returns X” needs evidence about the margin.",
+   cases:[["Antigravity","Q16","r1"],["Antigravity","Q16","r2"]]},
+  {name:"A correct headline with unsupported extras", tasks:"Q03 · Q07",
+   what:"Answers that scored 100 on the requested numbers added claims nobody asked for: an accounting judgement about reserves, and a full reconciliation with a finance ledger the task never provided.",
+   quote:"Finance can record the full amount as realized cash bookings without reserving against Week 8 chargebacks or refunds.", cite:"Antigravity, Q03 run 1, scored 100",
+   good:"The Q07 request says the numbers “don't reconcile with finance” but provides no finance ledger, so no answer could verify a full reconciliation.",
+   check:"Read the memo as carefully as the numbers. A high score covers the requested figures, not the advice after them.",
+   cases:[["Antigravity","Q03","r1"],["Antigravity","Q07","r1"],["Antigravity","Q07","r2"]]}
+];
+let version = "lenient", focus = null;
+const pc = p => PRODUCTS.find(x => x[0] === p)[1];
+const all = v => PRODUCTS.flatMap(([p]) => TASKS.flatMap(t => ["r1","r2"].map(r => ({p, t, r, d: DATA[v][p][t][r]}))));
+const el = (tag, attrs = {}, html = "") => { const e = document.createElement(tag); Object.assign(e, attrs); if (html) e.innerHTML = html; return e; };
+
+function stats(){
+  const a = all(version), pass = a.filter(x => x.d[0]), flagged = pass.filter(x => x.d[1]);
+  const prose = flagged.filter(x => !x.d[4].includes("metric")).length;
+  const e14 = a.filter(x => x.d[3].includes("E14")).length, s = a.filter(x => x.d[2]).length;
+  const items = [
+    [`${flagged.length}<small> / ${pass.length}</small>`, "passing answers still contained a wrong material claim"],
+    [`${prose}<small> / ${flagged.length}</small>`, "of those had every wrong claim in prose: conclusions, claims or the memo, not the numbers"],
+    [`${e14}<small> / 72</small>`, "answers tagged fabrication or unsupported certainty, the most common label"],
+    [`${s}<small> / 72</small>`, "answers with a wrong claim that no specific warning addressed"]];
+  const box = document.getElementById("stats"); box.innerHTML = "";
+  items.forEach(([b, t]) => box.append(el("div", {className: "stat"}, `<b>${b}</b><span>${t}</span>`)));
+}
+
+function map(){
+  const t = document.getElementById("map"); t.innerHTML = "";
+  const h1 = el("tr"); h1.append(el("th")); TASKS.forEach(k => h1.append(el("th", {className: "task", colSpan: 2}, k)));
+  t.append(el("thead")); t.tHead.append(h1);
+  const body = el("tbody"); t.append(body);
+  const hits = new Set((focus === null ? [] : PATTERNS[focus].cases).map(c => c.join("|")));
+  PRODUCTS.forEach(([p, color]) => {
+    const tr = el("tr"); const name = el("td", {className: "prod"}, p); name.style.setProperty("--pc", color); tr.append(name);
+    TASKS.forEach(k => ["r1","r2"].forEach(r => {
+      const d = DATA[version][p][k][r];
+      const cls = d[0] ? (d[1] ? "flag" : "ok") : "fail";
+      const c = el("td", {className: `cell ${cls}${d[2] ? " silent" : ""}${hits.has([p,k,r].join("|")) ? " hit" : ""}`}, r.slice(1));
+      const label = `${p} ${k} run ${r.slice(1)}: score ${d[5]}, ${d[0] ? "passed" : "failed"}${d[1] ? ", wrong claim" + (d[2] ? " (unwarned)" : " (warned)") : ""}${d[3].length ? ", labels " + d[3].join(" ") : ""}`;
+      c.title = label; c.setAttribute("aria-label", label);
+      tr.append(c);
+    }));
+    body.append(tr);
+  });
+  t.classList.toggle("focus", focus !== null);
+  document.getElementById("mapnote").textContent = focus === null ? "" :
+    `Highlighted: “${PATTERNS[focus].name}”, ${PATTERNS[focus].cases.length} answers. Select the button again to clear.`;
+}
+
+function patterns(){
+  const box = document.getElementById("patterns"); box.innerHTML = "";
+  PATTERNS.forEach((pt, i) => {
+    const s = el("article", {className: "pattern"});
+    const who = pt.cases.map(([p, t, r]) => `<span class="pill" style="--pc:${pc(p)}"><i></i>${p} ${t} ${r}</span>`).join("");
+    s.innerHTML = `<div class="top"><div><div class="tag">Pattern ${i + 1} · ${pt.tasks}</div><h3>${pt.name}</h3></div></div>
+      <div class="cols">
+        <div><h4 class="bad">What happened</h4><p>${pt.what}</p><blockquote>“${pt.quote}”<cite>${pt.cite}</cite></blockquote></div>
+        <div><h4 class="good">Same task, bounded answer</h4><p>${pt.good}</p></div>
+        <div><h4 class="acc">Reviewer check</h4><p>${pt.check}</p><div class="who">${who}</div></div>
+      </div>`;
+    const b = el("button", {className: "show", type: "button"}, "Show on map");
+    b.setAttribute("aria-pressed", String(focus === i));
+    b.addEventListener("click", () => { focus = focus === i ? null : i; map(); patterns(); document.getElementById("map").scrollIntoView({behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center"}); });
+    s.querySelector(".top").append(b);
+    box.append(s);
+  });
+}
+
+function matrix(){
+  const t = document.getElementById("mx"); t.innerHTML = "";
+  const head = el("tr"); head.append(el("th", {}, "Label"));
+  PRODUCTS.forEach(([p, c]) => { const th = el("th", {className: "p"}, p); th.style.setProperty("--pc", c); head.append(th); });
+  t.append(el("thead")); t.tHead.append(head);
+  const body = el("tbody"); t.append(body);
+  const count = (p, f) => TASKS.reduce((n, k) => n + ["r1","r2"].filter(r => f(DATA[version][p][k][r])).length, 0);
+  const rows = Object.keys(CODES).map(code => [code, CODES[code], p => count(p, d => d[3].includes(code))])
+    .filter(([, , f]) => PRODUCTS.some(([p]) => f(p) > 0))
+    .sort((a, b) => PRODUCTS.reduce((n, [p]) => n + b[2](p), 0) - PRODUCTS.reduce((n, [p]) => n + a[2](p), 0));
+  rows.push(["E", "Any wrong material claim", p => count(p, d => d[1]), true], ["S", "Any unwarned wrong claim", p => count(p, d => d[2]), true]);
+  rows.forEach(([code, name, f, total], idx) => {
+    const tr = el("tr"); if (total && code === "E") tr.className = "total";
+    tr.append(el("td", {className: "code"}, `${code}<span>${name}</span>`));
+    PRODUCTS.forEach(([p]) => {
+      const n = f(p), td = el("td", {className: "v"}, String(n));
+      td.style.background = n ? `color-mix(in srgb, var(--bad) ${Math.round(8 + n / 18 * 52)}%, var(--panel))` : "";
+      td.style.color = n / 18 > .45 ? "var(--panel)" : "";
+      tr.append(td);
+    });
+    body.append(tr);
+  });
+}
+
+function bars(){
+  const box = document.getElementById("bars"); box.innerHTML = "";
+  PRODUCTS.forEach(([p, c]) => {
+    const rs = TASKS.flatMap(k => ["r1","r2"].map(r => DATA[version][p][k][r]));
+    const ok = rs.filter(d => d[0] && !d[1]).length, flag = rs.filter(d => d[0] && d[1]).length, fail = rs.filter(d => !d[0]).length;
+    const row = el("div", {className: "brow"});
+    const n = el("div", {className: "name"}, p); n.style.setProperty("--pc", c); row.append(n);
+    const st = el("div", {className: "stack", role: "img"});
+    st.setAttribute("aria-label", `${p}: ${ok} passed clean, ${flag} passed with a wrong claim, ${fail} failed, of 18`);
+    [["s-ok", ok], ["s-flag", flag], ["s-fail", fail]].forEach(([k, v]) => { if (v) { const sp = el("span", {className: k}, String(v)); sp.style.width = (v / 18 * 100) + "%"; st.append(sp); } });
+    row.append(st); box.append(row);
+  });
+  const a = all(version).filter(x => x.d[0] && x.d[1]);
+  const memo = a.filter(x => x.d[4].length === 1 && x.d[4][0] === "memo").length;
+  document.getElementById("where").textContent = `Of the ${a.length} amber answers, ${memo} had wrong claims only in the memo. Green, amber, red: passed clean, passed with a wrong claim, failed.`;
+}
+
+function render(){
+  document.getElementById("vnote").textContent = version === "lenient"
+    ? "Lenient: where two judges disagreed, the reading more favorable to the answer counts. Antigravity uses a three-judge majority under both rules."
+    : "Strict: where two judges disagreed, the less favorable reading counts. Antigravity uses a three-judge majority under both rules.";
+  stats(); map(); patterns(); matrix(); bars();
+}
+document.querySelectorAll(".toggle button").forEach(b => b.addEventListener("click", () => {
+  version = b.dataset.v;
+  document.querySelectorAll(".toggle button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  render();
+}));
+render();
+</script>

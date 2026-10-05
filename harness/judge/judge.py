@@ -188,12 +188,20 @@ def _claim_problems(d: dict[str, Any], where: str) -> list[str]:
 
 
 def keep_automatic(log: dict[str, Any], pk: dict[str, Any]) -> dict[str, Any]:
-    """Automatic verdicts are arithmetic and stay; a judge disagreement becomes a recorded dispute note."""
+    """Keep arithmetic separately from the original semantic decision.
+
+    The effective verdict stays automatic, but a downstream finalizer must
+    adjudicate the preserved semantic objection. Normalization is not a
+    resolution of a matcher or reference defect.
+    """
     log = json.loads(json.dumps(log))
     notes = list(log.get("disputes") or [])
     for ref, auto in needs(pk)["auto"].items():
         d = (log.get("claims") or {}).get(ref)
         if isinstance(d, dict) and d.get("verdict") != auto:
+            d["semantic_verdict"] = d["verdict"]
+            d["semantic_decision"] = json.loads(json.dumps(d))
+            d["automatic_verdict"] = auto
             notes.append(f"judge verdict {d.get('verdict')!r} differs from the automatic {auto!r} for {ref}; automatic kept")
             d["verdict"] = auto
             if auto != "wrong":
@@ -286,7 +294,19 @@ def consensus(logs: list[dict[str, Any]], pk: dict[str, Any]) -> tuple[dict[str,
     for m in logs[0].get("memo_claims") or [] if len(logs) == 2 else [m for l in logs for m in (l.get("memo_claims") or [])]:
         support = sum(1 for l in logs if any(_same_quote(m["quote"], o["quote"]) and m["verdict"] == o["verdict"] for o in (l.get("memo_claims") or [])))
         if support >= need and not any(_same_quote(m["quote"], o["quote"]) for o in out["memo_claims"]):
-            out["memo_claims"].append(m)
+            sources = [next(o for o in l.get("memo_claims") or [] if _same_quote(m["quote"], o["quote"])
+                            and m["verdict"] == o["verdict"]) for l in logs
+                       if any(_same_quote(m["quote"], o["quote"]) and m["verdict"] == o["verdict"] for o in l.get("memo_claims") or [])]
+            combined = json.loads(json.dumps(m))
+            combined.pop("qualification_ref", None)
+            # A warning needs a majority of the whole eligible panel. A missing
+            # memo entry is not an affirmative warning vote.
+            warned_sources = [s for s in sources if s["warned"]]
+            combined["warned"] = len(warned_sources) >= need
+            if combined["warned"]:
+                combined["qualification_ref"] = warned_sources[0]["qualification_ref"]
+            combined["panel_sources"] = sources
+            out["memo_claims"].append(combined)
     return out, unresolved
 
 

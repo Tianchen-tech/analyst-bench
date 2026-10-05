@@ -22,7 +22,9 @@ MODULES = ("private/evaluation/grader/__init__.py", "private/evaluation/grader/i
            "private/evaluation/grader/tasks.py", "private/evaluation/grader/score.py", "private/evaluation/grader/review.py",
            "private/evaluation/grader/aggregate.py", "private/evaluation/grader/manifest.py", "private/evaluation/aliases.py",
            "private/evaluation/scoring.py", "private/evaluation/replay.py", "private/evaluation/policy.py", "private/evaluation/freeze.py",
-           "private/evaluation/gold.py", "private/evaluation/reference.py", "scripts/grade.py")
+           "private/evaluation/gold.py", "private/evaluation/reference.py", "scripts/grade.py",
+           "private/judge/judge.py", "private/judge/backends.py", "scripts/panel_combine.py", "scripts/final_results.py",
+           "scripts/regrade_pilot1.py")
 
 
 class GateError(RuntimeError):

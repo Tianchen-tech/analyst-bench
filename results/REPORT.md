@@ -1,82 +1,62 @@
-# Pilot-1 results: four products (LLM judge panel)
+# Pilot-1 results — scorer r4 correction
 
-**Scope:**
-- **Design:** 9 tasks × 2 repetitions per product, on one synthetic dataset, with a 1,200 s cap and the same frozen tasks, data and controller boundary for all products.
-- **Wave 1:** Codex (`gpt-6.1-sol`, high) and Claude Code (`claude-opus-5-5`, high).
-- **Wave 2:** Grok Build (`grok-4.7`, high) and Antigravity CLI (`gemini-3.8-flash-high`).
-- **Scoring:** scorer r3. Reviews come from a leave-own-provider-out judge panel (ID-50):
-  - judges: GPT (Codex CLI), Claude (Claude Code) and Grok (Grok Build); 162 judgments in total;
-  - each packet is judged by the judges whose provider is not the author's: two judges for Codex, Claude Code and Grok Build, three for Antigravity.
-- **Disagreements** (ID-55) are reported as a **lenient** and a **strict** version:
-  - lenient: either judge's benefit of the doubt counts;
-  - strict: either judge's objection counts;
-  - Antigravity is decided by majority in both versions.
-- **Data:** `private/results/pilot1_four_products.json`.
+**Status:** All 72 preserved submissions have been regraded. No contestant was rerun and no new judging call was made. This is an explicitly post-results evaluator correction, authorized October 5, 2026. Original r3 scores, judgments and outputs remain preserved as superseded history.
 
-This is a pilot. Each product has 18 attempts, so differences are descriptive, not statistically established.
+Nine tasks × two repetitions × four products used the same frozen synthetic warehouse and 1,200-second limit. The original cross-vendor panel supplied 162 judgments: two eligible judges for Codex, Claude Code and Grok Build; three for Antigravity. Two-judge results are shown as lenient | strict. Antigravity uses majority and median points in both versions. These are rule sensitivities, not confidence intervals.
 
-## Headline (lenient | strict)
+## Current metrics
 
 | Metric | Codex | Claude Code | Grok Build | Antigravity |
 |---|---|---|---|---|
-| Core accuracy (7 tasks × 2) | **14/14 \| 14/14** | 10/14 \| 10/14 | 9/14 \| 8/14 | 7/14 \| 7/14 |
+| Core accuracy (7 tasks × 2) | 14/14 | 10/14 | 9/14 \| 8/14 | 7/14 |
 | Valid abstention (Q26, Q27) | 4/4 | 4/4 | 3/4 | 2/4 |
 | Trap recall | 22/22 \| 21/22 | 19/22 | 20/22 | 18/22 |
-| Attempts with a wrong material claim (E) | 2 \| 4 /18 | 7 \| 13 /18 | 7 \| 10 /18 | 15 /18 |
-| Silent errors (wrong and unwarned, S) | 2 \| 4 /18 | 3 \| 11 /18 | 4 \| 9 /18 | 14 /18 |
-| Mean score | 100.0 \| 97.9 | 83.7 \| 82.8 | 79.0 \| 76.9 | 81.6 |
-| Speed-adjusted mean (ID-54, +10% max) | 106.9 \| 104.7 | 90.7 \| 89.7 | 81.5 \| 79.3 | 85.5 |
-| Median time per attempt | 331 s | **116 s** | 849 s | 275 s |
-| Correct answers per agent hour | 9.8 | **23.4** | 3.1 \| 2.8 | 6.6 |
-| Same success in both repetitions | 9/9 | 7/9 | 7/9 \| 6/9 | 8/9 |
-| Timeouts / format failures | 0 / 0 | 0 / 0 | 1 / 0 | 0 / 0 |
+| Attempts with a wrong material claim (E) | 0/18 \| 2/18 | 6/18 \| 12/18 | 5/18 \| 9/18 | 15/18 |
+| Silent errors (S) | 0/18 \| 2/18 | 2/18 \| 11/18 | 4/18 \| 9/18 | 14/18 |
+| Mean saved-content score | 100.00 \| 97.89 | 83.73 \| 82.76 | 81.82 \| 79.74 | 83.00 |
+| Speed-adjusted mean (≤ +10%) | 106.93 \| 104.68 | 90.72 \| 89.73 | 84.50 \| 82.30 | 86.88 |
+| Median seconds, all attempts | 331 | 116 | 849 | 275 |
+| Median seconds, successful deliveries | 331 | 107 | 685 \| 551 | 243 |
+| Successful deliveries per agent hour | 9.77 | 23.44 | 3.07 \| 2.81 | 6.60 |
+| Same delivery success in both repetitions | 9/9 | 7/9 | 7/9 \| 6/9 | 8/9 |
+| Terminal failures / format failures | 0 / 0 | 0 / 0 | 1 / 0 | 0 / 0 |
 
-**Reading:**
-- **Codex** is the most accurate and the most consistent: every core task succeeded in both repetitions under both versions.
-- **Claude Code** is the fastest by far, about 3× Codex's speed, and has the most correct answers per hour. Its failures concentrate in Q14 (both repetitions) and in one repetition each of Q07 and Q16.
-- **Grok Build** is the slowest: its median is 14 minutes, and one attempt hit the 20-minute cap.
-- **Antigravity** has the highest error and silent-error incidence (15/18 attempts contain a wrong material claim), and it lost both repetitions of Q26.
-- **Robustness:** the ordering Codex > Claude Code > Grok Build ≈ Antigravity on core accuracy holds in both versions.
+All 18 selected responses per product are substantive. Silent-error rates therefore use denominator 18 here; an empty response would not silently become an error-free substantive answer. The excluded Claude quota interruption remains documented as infrastructure, with its selected replacement.
 
-## Per task (lenient score; ✓/✗ success)
+## Scores by task
 
 | Task | Codex | Claude Code | Grok Build | Antigravity |
 |---|---|---|---|---|
-| Q03 | 100 ✓, 100 ✓ | 100 ✓, 100 ✓ | 100 ✓, 100 ✓ | 100 ✓, 100 ✓ |
-| Q04 | 100 ✓, 100 ✓ | 100 ✓, 100 ✓ | 100 ✓, 100 ✓ | 100 ✓, 100 ✓ |
-| Q07 | 100 ✓, 100 ✓ | 100 ✓, 0 ✗ | 40 ✗, 0 ✗ | 100 ✓, 100 ✓ |
-| Q12 | 100 ✓, 100 ✓ | 92.9 ✓, 89.3 ✓ | 88.1 ✓, 93.0 ✓ (timeout) | 74.7 ✗, 74.7 ✗ |
-| Q14 | 100 ✓, 100 ✓ | 25 ✗, 25 ✗ | 50 ✗, 50 ✗ | 25 ✗, 75 ✗ |
-| Q16 | 100 ✓, 100 ✓ | 100 ✓, 75 ✗ | 100 ✓, 100 ✓ | 90 ✓, 75 ✗ |
-| Q17 | 100 ✓, 100 ✓ | 100 ✓, 100 ✓ | 100 ✓, 75 ✗ | 77.5 ✗, 77 ✗ |
-| Q26 | 100 ✓, 100 ✓ | 100 ✓, 100 ✓ | 50 ✗, 75 ✓ | 50 ✗, 50 ✗ |
-| Q27 | 100 ✓, 100 ✓ | 100 ✓, 100 ✓ | 100 ✓, 100 ✓ | 100 ✓, 100 ✓ |
+| Q03 | 100.0 ✓, 100.0 ✓ | 100.0 ✓, 100.0 ✓ | 100.0 ✓, 100.0 ✓ | 100.0 ✓, 100.0 ✓ |
+| Q04 | 100.0 ✓, 100.0 ✓ | 100.0 ✓, 100.0 ✓ | 100.0 ✓, 100.0 ✓ | 100.0 ✓, 100.0 ✓ |
+| Q07 | 100.0 ✓, 100.0 ✓ \| 100.0 ✓, 80.0 ✓ | 100.0 ✓, 0.0 ✗ | 40.0 ✗, 26.7 ✗ \| 33.3 ✗, 26.7 ✗ | 100.0 ✓, 100.0 ✓ |
+| Q12 | 100.0 ✓, 100.0 ✓ \| 96.0 ✓, 96.0 ✓ | 92.9 ✓, 89.3 ✓ | 88.1 ✓, 93.0 ✗ (timeout) \| 86.0 ✓, 89.3 ✗ (timeout) | 74.7 ✗, 74.7 ✗ |
+| Q14 | 100.0 ✓, 100.0 ✓ | 25.0 ✗, 25.0 ✗ \| 25.0 ✗, 12.5 ✗ | 50.0 ✗, 50.0 ✗ | 50.0 ✗, 75.0 ✗ |
+| Q16 | 100.0 ✓, 100.0 ✓ | 100.0 ✓, 75.0 ✗ | 100.0 ✓, 100.0 ✓ \| 100.0 ✓, 75.0 ✗ | 90.0 ✓, 75.0 ✗ |
+| Q17 | 100.0 ✓, 100.0 ✓ | 100.0 ✓, 100.0 ✓ | 100.0 ✓, 100.0 ✓ | 77.5 ✗, 77.0 ✗ |
+| Q26 | 100.0 ✓, 100.0 ✓ \| 95.0 ✓, 95.0 ✓ | 100.0 ✓, 100.0 ✓ \| 95.0 ✓, 100.0 ✓ | 50.0 ✗, 75.0 ✓ | 50.0 ✗, 50.0 ✗ |
+| Q27 | 100.0 ✓, 100.0 ✓ | 100.0 ✓, 100.0 ✓ | 100.0 ✓, 100.0 ✓ | 100.0 ✓, 100.0 ✓ |
 
-## Open policy point (not changed after results)
+## What r4 corrects
 
-**What happened:** Grok Build's Q12 r2 hit the 1,200 s cap. The scorer graded the files present at the cap, and the attempt scored 93.0 (lenient) or 89.3 (strict), so it counts as a success.
+- The metric matcher checks statistic, population, weighting, event identity and calendar/cohort windows. The all-output regression covers 1,358 metrics. Forty-nine formerly matched identities are corrected, including 26 all-company metrics and three cohort concentration metrics. An unsupported supplementary quantity is sent to review; it is not compared to an unrelated reference or automatically called correct.
+- Semantic objections survive normalization and finalization. An unresolved objection blocks final scoring; a versioned resolution binds its exact source notes and policy. Original judgments are unchanged. Derived judgments identify every edited decision and its source hashes.
+- Memo warnings follow the same two-judge any/all rule as structured claims. A three-judge memo warning needs an affirmative majority of the entire eligible panel. Rounding and gross/net caveats do not qualify an incorrect server scope.
+- Newly exposed review items receive explicit evidence decisions. These audit derivations are AI repair decisions, not new blind judgments or human review. Other qualitative panel decisions are carried forward with their limitations.
+- Timeouts/errors are unsuccessful deliveries under the pre-registered design. A saved answer keeps its content score and E/S labels. The timeout affects accuracy, throughput, repetition agreement and successful-time summaries consistently.
 
-**Why it is open:** design 5.4's core-accuracy row says "terminal failures count unsuccessful". The frozen aggregate counts success from the score alone and lists timeouts separately.
+The corrected disagreement counter finds **41/72** original saved panels with a material disagreement (r3 reported 38/72). After applying the explicitly recorded r4 derivations, **40/72** derived panels disagree. The two figures use different decision versions and must not be conflated.
 
-**Effect under the design wording:** Grok Build's core accuracy would be 8/14 lenient and 7/14 strict. Nothing else changes. This is disclosed rather than changed after the results were seen.
+## Supported interpretation
 
-## Disclosures (all recorded in the design log)
+Codex passed all seven core tasks in both repetitions under both rules. Removing evaluator-created errors changes its error profile; a passed task still need not have every supplementary claim accepted by every reviewer. Claude Code has the shortest median runtime and the highest successful deliveries per agent hour in this pilot. Grok Build has the longest median runtime and one timeout. Long runtime is not evidence of training failure, nor does this experiment identify a causal relationship between reasoning time and errors.
 
-1. **Isolation:** host sandbox, not a VM (ID-44).
-2. **Wave-1 conditions:**
-   - the same-day repetitions, the mid-wave change of the quota gates and the stale-driver incident (`WAVE1_REPORT.md`);
-   - Claude Code's allowance was shared with the operator.
-3. **Review protocol changed after collection.** Owner review was replaced by LLM judging because of the workload (ID-47), and then by the leave-own-provider-out panel (ID-50). The owner consented to sending blind packets and the private references to xAI, OpenAI, Anthropic and Google; training and memory were off where the account allows it. The wave-1 Grok-only review is superseded history.
-4. **Scorer changes made after seeing wave-1 results:**
-   - ID-48: a provided `task.md` cited as evidence is valid;
-   - ID-51: ISO interval notation is read correctly; this restored 20 points on each Codex Q07 answer;
-   - ID-54: the speed-adjusted score was defined during wave 2.
-5. **Products:**
-   - Gemini CLI was rejected by Google's personal-account policy, so Antigravity CLI is the Google product (ID-52).
-   - Antigravity's sandbox also allowed localhost (for its language server), and its server-side web search could not be disabled (ID-53). It made **0** web searches in its 18 formal attempts.
-   - Grok had seen the task references earlier as the wave-1 judge, with training and memory off.
-6. **Judging:**
-   - Two-judge disagreement is reported as a range (ID-55).
-   - Material disagreements appeared in 38 of 72 packets. Mostly they concern whether a claim is wrong or warned; success differs in only 4 packets.
-   - Automatic arithmetic verdicts were never overridden.
-7. **Scale:** 9 tasks and one dataset. Results are per task and descriptive.
+The diagnostic cases are more useful than a generalized ranking: the wrong delivery scope in Q07, confusion between a cohort window and a calendar window in Q14, causal recommendations despite an invalid experiment, and unsupported customer motives. The evaluator's own metric-identity mistakes are retained as regression evidence.
+
+## Limitations and protocol disclosures
+
+This is one synthetic dataset and only 18 attempts per product. It does not establish broad product superiority or measure whether humans detect errors. The qualitative judgments remain those of the original AI panel, with the documented corrections; no new independent human adjudication was performed.
+
+Collection used personal subscription allowances and a shared macOS sandbox rather than a VM. The mid-wave quota gate change, same-day wave-1 repetitions, stale-driver incident and shared Claude allowance remain disclosed in the operations report. Antigravity additionally allowed localhost for its language server, and its server-side web search could not be disabled; it made zero searches in the selected runs. Grok had seen references earlier as a wave-1 judge. Review moved from planned owner review to AI judging and then a cross-vendor panel after collection. ISO parsing and the secondary speed bonus were also changed during the pilot. r4 was decided after all results were visible, and that timing is explicit.
+
+The public release withholds the data, generator, answer key, task-specific scorer, and raw submissions/judgments. It is a results/methods release and cannot reproduce this scoring end to end.

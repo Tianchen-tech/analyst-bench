@@ -15,21 +15,29 @@ This repository publishes **Pilot-1**: four agent products, nine tasks, two inde
 
 | Metric | Codex | Claude Code | Grok Build | Antigravity |
 |---|---|---|---|---|
-| Core accuracy (7 tasks × 2) | **14/14** | 10/14 | 9/14 \| 8/14 | 7/14 |
-| Unanswerable tasks handled (Q26, Q27) | 4/4 | 4/4 | 3/4 | 2/4 |
+| Core accuracy (7 tasks × 2) | 14/14 | 10/14 | 9/14 \| 8/14 | 7/14 |
+| Valid abstention (Q26, Q27) | 4/4 | 4/4 | 3/4 | 2/4 |
 | Trap recall | 22/22 \| 21/22 | 19/22 | 20/22 | 18/22 |
-| Answers with a wrong material claim | 2 \| 4 /18 | 7 \| 13 /18 | 7 \| 10 /18 | 15/18 |
-| Silent errors (wrong and unwarned) | 2 \| 4 /18 | 3 \| 11 /18 | 4 \| 9 /18 | 14/18 |
-| Mean score | 100.0 \| 97.9 | 83.7 \| 82.8 | 79.0 \| 76.9 | 81.6 |
-| Speed-adjusted score (≤ +10%) | 106.9 \| 104.7 | 90.7 \| 89.7 | 81.5 \| 79.3 | 85.5 |
-| Median time per attempt | 331 s | **116 s** | 849 s | 275 s |
-| Correct answers per agent hour | 9.8 | **23.4** | 3.1 \| 2.8 | 6.6 |
+| Attempts with a wrong material claim (E) | 0/18 \| 2/18 | 6/18 \| 12/18 | 5/18 \| 9/18 | 15/18 |
+| Silent errors (S) | 0/18 \| 2/18 | 2/18 \| 11/18 | 4/18 \| 9/18 | 14/18 |
+| Mean saved-content score | 100.00 \| 97.89 | 83.73 \| 82.76 | 81.82 \| 79.74 | 83.00 |
+| Speed-adjusted mean (≤ +10%) | 106.93 \| 104.68 | 90.72 \| 89.73 | 84.50 \| 82.30 | 86.88 |
+| Median seconds, all attempts | 331 | 116 | 849 | 275 |
+| Median seconds, successful deliveries | 331 | 107 | 685 \| 551 | 243 |
+| Successful deliveries per agent hour | 9.77 | 23.44 | 3.07 \| 2.81 | 6.60 |
+| Same delivery success in both repetitions | 9/9 | 7/9 | 7/9 \| 6/9 | 8/9 |
+| Terminal failures / format failures | 0 / 0 | 0 / 0 | 1 / 0 | 0 / 0 |
 
 **Findings:**
-- **Codex** was the most accurate and the most consistent. It passed every core task in both attempts.
-- **Claude Code** was about three times faster than Codex and had the most correct answers per hour. Its failures concentrate on one task (Q14).
-- **Grok Build** was the slowest. One attempt hit the 20-minute cap.
-- **Antigravity** had the most wrong claims.
+
+- Codex passed every core task in both repetitions in this pilot. Its r4 error labels exclude the demonstrated evaluator identity mistakes.
+- Claude Code had the shortest median runtime and the most successful deliveries per agent hour.
+- Grok Build had the longest median runtime. Its timeout keeps the saved-content score and counts as an unsuccessful delivery.
+- Antigravity's error incidence remains high under the original majority panel; this is one small synthetic pilot.
+
+**Correction version:** scorer r4, applied after all results were visible. All 72 outputs were regraded using the same frozen data and original 162 judgments, with explicit source-bound repair decisions. No contestant rerun or new judging call was made. Unsupported supplementary metrics remain unverifiable unless their own quantity was independently checked. Original r3 results are in [`results/history/r3/`](results/history/r3).
+
+**Error patterns:** [`FINDINGS.md`](FINDINGS.md) (dashboard: [`docs/findings.html`](docs/findings.html)) describes the five recurring ways the agents went wrong, with real cases and a review checklist. The short version: the agents found data problems well, but finding a problem did not reliably stop them from overstating their conclusions.
 
 With 18 attempts per product on one dataset, these are descriptive results, not statistical claims. The full report with per-task scores and every disclosure is in [`results/REPORT.md`](results/REPORT.md).
 
@@ -56,6 +64,16 @@ The nine Pilot-1 tasks are in [`tasks/`](tasks). Each task folder holds the exac
 
 The unanswerable tasks test whether an agent says what the data cannot establish instead of inventing an answer.
 
+## Running the tasks yourself
+
+The task statements, results and error cases in this repository are public, so an agent with web access could look up what each task tests. If you run these tasks on an agent:
+
+- turn off web search and URL fetching for the agent;
+- ideally allow network access only to the model's own inference endpoint, as the Pilot-1 harness did (see `harness/runners/proxy.py`);
+- if a product's server-side search cannot be switched off, record and report every search it makes.
+
+Treat any new scores as a fresh run on known tasks, not as a continuation of Pilot-1. The dataset is not included in this repository.
+
 ## How the evaluation works
 
 See [`METHODOLOGY.md`](METHODOLOGY.md) for the full protocol. In short:
@@ -69,7 +87,7 @@ See [`METHODOLOGY.md`](METHODOLOGY.md) for the full protocol. In short:
 3. **Grading:**
    - a deterministic scorer checks the structured numbers against the hidden answer key and replays submitted SQL in a restricted sandbox;
    - AI judges from other vendors decide the remaining review items, such as whether a recommendation is properly qualified, whether a claim is wrong, and whether it was warned;
-   - automatic arithmetic verdicts are never overridden by a judge.
+   - arithmetic is protected after checking metric identity; semantic objections require a versioned resolution and remain visible.
 4. **Metrics:** core accuracy, valid abstention, trap recall, error and silent-error incidence, and time. A secondary speed-adjusted score rewards correct answers only.
 
 ## Repository layout
@@ -81,9 +99,10 @@ See [`METHODOLOGY.md`](METHODOLOGY.md) for the full protocol. In short:
 | `harness/judge/` | Judge protocol (the exact instructions judges receive), prompt builder, validation and consensus, judge backends |
 | `harness/grader/` | Scorer core: intake, finalize and review, aggregation, SQL replay sandbox, run-bundle validator |
 | `harness/scripts/` | The command-line entry points used to run preflights, waves, grading, judging and the final aggregation |
+| `FINDINGS.md` | Error patterns across the 72 answers, with cases and reviewer checks |
 | `results/` | Final results (`pilot1_four_products.json`) and the results report |
 | `reports/` | Operational reports: runner build and preflight, wave-1 operations and incidents |
-| `docs/` | The results dashboard |
+| `docs/` | The results dashboard (`index.html`) and the error-pattern dashboard (`findings.html`) |
 
 ## What is not published
 
@@ -104,6 +123,7 @@ Because of this, the harness here documents exactly how the evaluation ran, but 
 The evaluation protocol changed during the pilot, and each change is recorded with its timing and reason:
 - the review moved from planned owner review to an AI judge panel;
 - two grader fixes were made after wave-1 results were seen;
+- r4 corrected evaluator defects after all results were visible, reusing preserved outputs and judging records;
 - a secondary speed bonus was added during wave 2;
 - Antigravity's server-side web search could not be disabled; it was used 0 times in scored attempts;
 - Gemini CLI could not be used with a personal Google account, so Antigravity CLI is the Google product.
