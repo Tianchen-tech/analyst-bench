@@ -119,6 +119,13 @@ footer{color:var(--muted);font-size:12px}
     </div>
   </header>
 
+<!-- shared-panel-update:start -->
+  <section class="panel" aria-label="Shared-panel robustness check">
+    <h2>The same judges preserve the core-performance ordering</h2>
+    <p>The charts on this page retain the original r4 panel. A separate comparison added 54 blind reviews so all 72 answers have GPT, Claude and Grok judges. Shared-panel means: Codex 99.60, Claude Code 83.73, Grok Build 81.82, Antigravity 83.00. Core successes: 14/14, 10/14, 9/14, 7/14.</p>
+    <p>Silent errors under the shared panel: 0/18, 5/18, 6/18, 14/18, respectively. Five statements still have exact three-way splits. Equal judge assignment does not prove unbiased grading or zero true errors. <a href="https://github.com/Tianchen-tech/analyst-bench/blob/main/results/REPORT.md#what-changed-with-the-same-judges-for-every-product">Read the comparison and limitations</a>.</p>
+  </section>
+<!-- shared-panel-update:end -->
   <section class="cards" id="cards" aria-label="Product overview"></section>
 
   <div class="grid2">
@@ -139,7 +146,7 @@ footer{color:var(--muted);font-size:12px}
     <div class="head"><h2>Scores by task</h2>
       <div class="legend"><span><span class="sw" style="background:var(--heat3)"></span>≥ 95</span><span><span class="sw" style="background:var(--heat2)"></span>80–95</span><span><span class="sw" style="background:var(--heat1)"></span>50–80</span><span><span class="sw" style="background:var(--heat0)"></span>&lt; 50</span><span>✓ pass · ✗ fail · ⏱ timeout</span></div>
     </div>
-    <p class="sub">Pass: core tasks need 80+ and no critical error; unanswerable tasks (Q26, Q27) need 75+ and no invented answer. r1 and r2 are the two independent attempts. A terminal failure does not pass; its saved-content score is still shown. A terminal failure does not pass; its saved-content score is still shown. A terminal failure does not pass; its saved-content score is still shown.</p>
+    <p class="sub">Pass: core tasks need 80+ and no critical error; unanswerable tasks (Q26, Q27) need 75+ and no invented answer. r1 and r2 are the two independent attempts. A terminal failure does not pass; its saved-content score is still shown.</p>
     <div class="scroll"><table class="heat" id="heat"></table></div>
   </section>
 
@@ -169,7 +176,7 @@ footer{color:var(--muted);font-size:12px}
       <li><b>r4 correction after all results:</b>all 72 preserved outputs were regraded; no contestant reruns or new judge calls. Metric identity, memo warnings, objection handling and timeout summaries are corrected. Original panel material disagreement: 41/72; derived r4 panel: 40/72. The correction is AI audit work, not a new blind human review.</li>
     </ol>
   </details>
-  <footer>Analyst Bench · Pilot-1 · Figures from the grader output (scorer r4). This page contains no reference answers.</footer>
+  <footer>Analyst Bench · Pilot-1 · Figures from the grader output (scorer r4). This page contains no reference answers. Built with GPT-6-Astra (framework), Claude Opus 5.5 (implementation) and GPT-6.1-sol (audit); the last two also power Claude Code and Codex. <a href="https://github.com/Tianchen-tech/analyst-bench#how-this-project-was-built">How it was built</a>.</footer>
 </div>
 
 <script>

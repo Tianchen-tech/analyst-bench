@@ -1,10 +1,35 @@
-# Pilot-1 results — scorer r4 correction
+# Pilot-1 results — r4 correction and shared-panel robustness check
 
-**Status:** All 72 preserved submissions have been regraded. No contestant was rerun and no new judging call was made. This is an explicitly post-results evaluator correction, authorized October 5, 2026. Original r3 scores, judgments and outputs remain preserved as superseded history.
+**Status:** The r4 correction regraded all 72 preserved submissions without new contestant or judge calls. A subsequent, separate comparison added 54 blind reviews to give every answer the same three judges. Both changes followed inspection of the results on October 5, 2026. Original r3 history and original r4 results remain preserved.
 
 Nine tasks × two repetitions × four products used the same frozen synthetic warehouse and 1,200-second limit. The original cross-vendor panel supplied 162 judgments: two eligible judges for Codex, Claude Code and Grok Build; three for Antigravity. Two-judge results are shown as lenient | strict. Antigravity uses majority and median points in both versions. These are rule sensitivities, not confidence intervals.
 
-## Current metrics
+## What changed with the same judges for every product
+
+The original panel excluded a product's own provider. That gave Codex, Claude Code and Grok Build different pairs of judges, while Antigravity had all three. Differences in judge strictness could therefore affect the product comparison. After seeing this concern, we added 54 author-blinded reviews: every preserved answer now has one GPT, one Claude and one Grok review, including its own provider where applicable. The original 162 reviews and r4 results remain preserved. No contestant was rerun.
+
+This separate robustness check applies majority decisions and median component points to all four products. It reuses the archived initial prompts and the named models, with the same r4 identity corrections. Collection happened later; dates, observed CLI versions and model identifiers are recorded. It is not a pre-registered primary result or an independent human assessment.
+
+| Product | Original r4 mean (lenient / strict) | Shared-panel mean | Shared-panel core accuracy | Original r4 silent errors (lenient / strict) | Shared-panel silent errors |
+|---|---:|---:|---:|---:|---:|
+| Codex | 100.00 / 97.89 | 99.60 | 14/14 | 0/18 / 2/18 | 0/18 (0.0%) |
+| Claude Code | 83.73 / 82.76 | 83.73 | 10/14 | 2/18 / 11/18 | 5/18 (27.8%) |
+| Grok Build | 81.82 / 79.74 | 81.82 | 9/14 | 4/18 / 9/18 | 6/18 (33.3%) |
+| Antigravity | 83.00 / 83.00 | 83.00 | 7/14 | 14/18 / 14/18 | 14/18 (77.8%) |
+
+**The performance ordering is stable in this pilot.** Mean scores still order Codex, Claude Code, Antigravity, then Grok Build; core accuracy orders Codex, Claude Code, Grok Build, then Antigravity. Codex stays at 14/14 core successes. Its shared-panel mean is 99.60, compared with the original 100.00 / 97.89. The small decrease from the old lenient mean comes from both Q12 answers omitting an explicit difference-in-differences quantity required by the rubric. Adding GPT did not produce a large Codex score decrease under the declared combination rule.
+
+**Silent-error incidence depends materially on the evaluator.** Claude Code's original 2/18 / 11/18 becomes 5/18; Grok Build's 4/18 / 9/18 becomes 6/18. These are changed judgments of the same saved answers, not changes in agent ability. All 18 answers per product are substantive, so the denominator is 18. A correct headline number can still coexist with a wrong or insufficiently qualified explanation in the memo.
+
+**A stricter judge is not automatically a more accurate judge.** Audit checks found evaluator mistakes as well as agent mistakes. A new missing-module objection arose because neutral review aliases renamed the evidence files while leaving an import unchanged; the original archive contains the dependency. This invalidates that objection's missing-file reason, but does not by itself prove complete script reproducibility. Another numerical objection confused absence from the reference calculation with factual error; an independent calculation confirmed the submitted rounded figures. Source votes remain preserved.
+
+The shared panel addresses unequal judge assignment; it does not demonstrate unbiased grading. Same-provider preference, incomplete references and presentation effects can remain. There are five exact three-way claim splits across four answers. Their existing lenient/strict fallbacks agree on the means, core accuracy and silent-error counts above, but Codex's wrong-material-claim count is 0/18 or 1/18. That disputed statement is qualified, so its silent-error count remains 0/18 under either fallback. Zero panel-confirmed silent errors is not proof of zero true errors. No independent human adjudication has resolved these statements.
+
+The main error-pattern conclusion still stands: review the deliverable's scope, causal interpretation, customer-motive claims and memo, even when the requested calculations pass. The added methodological finding is that evaluator assignment and warning interpretation must be reported alongside silent-error rates. The error-taxonomy counts elsewhere remain the original r4 counts; they have not been relabelled as shared-panel results.
+
+The aggregate comparison is inspectable in [`pilot1_shared_panel_comparison.json`](pilot1_shared_panel_comparison.json). The old two-judge lenient/strict endpoints and the exact-three-way fallbacks are rule sensitivities, not confidence intervals.
+
+## Original r4 metrics (preserved baseline)
 
 | Metric | Codex | Claude Code | Grok Build | Antigravity |
 |---|---|---|---|---|
@@ -23,7 +48,7 @@ Nine tasks × two repetitions × four products used the same frozen synthetic wa
 
 All 18 selected responses per product are substantive. Silent-error rates therefore use denominator 18 here; an empty response would not silently become an error-free substantive answer. The excluded Claude quota interruption remains documented as infrastructure, with its selected replacement.
 
-## Scores by task
+## Original r4 scores by task
 
 | Task | Codex | Claude Code | Grok Build | Antigravity |
 |---|---|---|---|---|
@@ -55,7 +80,7 @@ The diagnostic cases are more useful than a generalized ranking: the wrong deliv
 
 ## Limitations and protocol disclosures
 
-This is one synthetic dataset and only 18 attempts per product. It does not establish broad product superiority or measure whether humans detect errors. The qualitative judgments remain those of the original AI panel, with the documented corrections; no new independent human adjudication was performed.
+This is one synthetic dataset and only 18 attempts per product. It does not establish broad product superiority or measure whether humans detect errors. The preserved r4 baseline uses the original AI panel with documented corrections; the separate shared-panel comparison includes the 54 later reviews. Neither has new independent human adjudication. Backfill dates and CLI versions differ from the original collection, and masking explicit product labels cannot eliminate all author clues.
 
 Collection used personal subscription allowances and a shared macOS sandbox rather than a VM. The mid-wave quota gate change, same-day wave-1 repetitions, stale-driver incident and shared Claude allowance remain disclosed in the operations report. Antigravity additionally allowed localhost for its language server, and its server-side web search could not be disabled; it made zero searches in the selected runs. Grok had seen references earlier as a wave-1 judge. Review moved from planned owner review to AI judging and then a cross-vendor panel after collection. ISO parsing and the secondary speed bonus were also changed during the pilot. r4 was decided after all results were visible, and that timing is explicit.
 

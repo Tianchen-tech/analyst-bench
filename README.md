@@ -11,7 +11,11 @@ This repository publishes **Pilot-1**: four agent products, nine tasks, two inde
 **Setup:**
 - **Products:** Codex (`gpt-6.1-sol`, reasoning high), Claude Code (`claude-opus-5-5`, high), Grok Build (`grok-4.7`, high) and Antigravity CLI (`gemini-3.8-flash-high`).
 - **Attempts:** 18 per product (9 tasks × 2), each in a fresh session inside a local sandbox.
-- **Judging:** answers were judged by AI judges from the *other* vendors. Where two judges disagree, results are shown as **lenient | strict**.
+- **Original judging:** answers were judged by AI judges from the *other* vendors. Where two judges disagree, original r4 results are shown as **lenient | strict**. A separate post-results check now gives every answer GPT, Claude and Grok judges, including its own provider where applicable.
+
+**Shared-panel check:** 54 additional blind reviews complete 216 reviews of the same 72 answers. Shared-panel means are Codex **99.60**, Claude Code **83.73**, Grok Build **81.82**, Antigravity **83.00**. Core successes are **14/14, 10/14, 9/14, 7/14**; silent errors are **0/18, 5/18, 6/18, 14/18**. The mean-score and core-accuracy orderings are unchanged, but several silent-error labels change. Equal judge assignment does not prove unbiased grading or zero true errors; five statements retain exact three-way splits. See the [comparison and limitations](results/REPORT.md#what-changed-with-the-same-judges-for-every-product) and [aggregate comparison](results/pilot1_shared_panel_comparison.json).
+
+The table and dashboard charts below retain the **original r4 baseline**:
 
 | Metric | Codex | Claude Code | Grok Build | Antigravity |
 |---|---|---|---|---|
@@ -100,7 +104,7 @@ See [`METHODOLOGY.md`](METHODOLOGY.md) for the full protocol. In short:
 | `harness/grader/` | Scorer core: intake, finalize and review, aggregation, SQL replay sandbox, run-bundle validator |
 | `harness/scripts/` | The command-line entry points used to run preflights, waves, grading, judging and the final aggregation |
 | `FINDINGS.md` | Error patterns across the 72 answers, with cases and reviewer checks |
-| `results/` | Final results (`pilot1_four_products.json`) and the results report |
+| `results/` | Preserved r4 results (`pilot1_four_products.json`), a separate shared-panel aggregate comparison and the results report |
 | `reports/` | Operational reports: runner build and preflight, wave-1 operations and incidents |
 | `docs/` | The results dashboard (`index.html`) and the error-pattern dashboard (`findings.html`) |
 
@@ -118,14 +122,39 @@ The 342 MB DuckDB file is not in this repository either.
 
 Because of this, the harness here documents exactly how the evaluation ran, but it cannot reproduce the scores end to end on its own.
 
+## How this project was built
+
+The benchmark was built with AI models working in three roles, under the direction of the project owner:
+
+- **Framework:** GPT-6-Astra designed the overall project framework.
+- **Implementation:** Claude Opus 5.5 (`claude-opus-5-5`, through Claude Code) built each concrete step. This included the data generator, the tasks and reference answers, the scorer, the sandbox harness, the judging pipeline, and the reports and dashboards.
+- **Audit:** GPT-6.1-sol (`gpt-6.1-sol`, through Codex) audited each step before it was accepted. About 30 written review and audit reports are kept in the private repository.
+
+The owner set the direction and made the protocol decisions recorded in [`METHODOLOGY.md`](METHODOLOGY.md).
+
+**Conflict of interest:** two of these models are also the models behind two of the products under test:
+- Claude Code ran `claude-opus-5-5`, the implementing model.
+- Codex ran `gpt-6.1-sol`, the auditing model.
+
+The models behind Grok Build and Antigravity had no building role. Grok served only as a judge.
+
+**What limits the effect:**
+- Contestant runs used fresh profiles with no memory, no project files and no access to the build sessions.
+- Reference answers are computed from the data generator, not from model judgement.
+- Judging used other vendors' models.
+
+**What it does not rule out:** the tasks, rubrics and reference answers may still reflect how these two models frame an analysis, and that could favor their products. No independent human review has checked for this.
+
 ## Disclosures
 
 The evaluation protocol changed during the pilot, and each change is recorded with its timing and reason:
 - the review moved from planned owner review to an AI judge panel;
 - two grader fixes were made after wave-1 results were seen;
 - r4 corrected evaluator defects after all results were visible, reusing preserved outputs and judging records;
+- a later shared-panel comparison added 54 blind reviews after results were visible; it preserves the original r4 result and documents remaining splits;
 - a secondary speed bonus was added during wave 2;
 - Antigravity's server-side web search could not be disabled; it was used 0 times in scored attempts;
 - Gemini CLI could not be used with a personal Google account, so Antigravity CLI is the Google product.
+- the models that implemented and audited the benchmark are also the models behind Claude Code and Codex (see [How this project was built](#how-this-project-was-built)).
 
 See [`results/REPORT.md`](results/REPORT.md) and [`METHODOLOGY.md`](METHODOLOGY.md).

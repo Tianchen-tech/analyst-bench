@@ -142,6 +142,12 @@ footer{color:var(--muted);font-size:12px}
     </div>
   </header>
 
+  <section class="panel" aria-label="Shared-panel robustness check">
+    <div class="head"><h2>Completing the judge panel changes the error labels more than the ordering</h2></div>
+    <p class="sub">The case map and taxonomy counts below retain the original r4 panel. A separate post-results check adds 54 blind reviews: all 72 answers now have GPT, Claude and Grok judges. Shared-panel means are 99.60, 83.73, 81.82 and 83.00 for Codex, Claude Code, Grok Build and Antigravity, respectively; core successes are 14/14, 10/14, 9/14 and 7/14.</p>
+    <p class="sub">Silent errors are 0/18, 5/18, 6/18 and 14/18. The same answers receive different labels when evaluator composition and warning interpretation change. Five statements retain exact three-way splits, and equal assignment does not prove unbiased grading or zero true errors. <a href="https://github.com/Tianchen-tech/analyst-bench/blob/main/results/REPORT.md#what-changed-with-the-same-judges-for-every-product">Read the before/after report</a>.</p>
+  </section>
+
   <section class="stats" id="stats" aria-label="Headline counts"></section>
 
   <section class="panel">
@@ -207,7 +213,7 @@ footer{color:var(--muted);font-size:12px}
     </ul>
   </details>
 
-  <footer>Analyst Bench · Pilot-1 · Figures from the grader output (scorer r4). This page contains no reference answers.</footer>
+  <footer>Analyst Bench · Pilot-1 · Case map and taxonomy counts: original scorer r4 panel. Shared-panel comparison: separate update above. This page contains no reference answers. Built with GPT-6-Astra (framework), Claude Opus 5.5 (implementation) and GPT-6.1-sol (audit); the last two also power Claude Code and Codex. <a href="https://github.com/Tianchen-tech/analyst-bench#how-this-project-was-built">How it was built</a>.</footer>
 </div>
 
 <script>

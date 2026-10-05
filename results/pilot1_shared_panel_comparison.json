@@ -1,0 +1,269 @@
+{
+  "kind": "uniform_three_judge_comparison_v1",
+  "rubric_version": "r4",
+  "post_results_comparison": true,
+  "source_sha256": "7d2612afe1178a8b0662b8f18b6202491878ccbbb344554bf02be3eaa73ed7ff",
+  "baseline_sha256": "97511cda4f8b00729f8c0512a263e5f91d10258239a1bc006b376943139c8df2",
+  "comparison_manifest_sha256": "ee22f834352c607486c16b9ae34ebd199d306d0f5746002c417a26e875a2f6ee",
+  "outputs": 72,
+  "judge_coverage": {
+    "grok": 72,
+    "claude": 72,
+    "gpt": 72
+  },
+  "original_reviews": 162,
+  "added_reviews": 54,
+  "total_reviews": 216,
+  "unresolved_statements": 5,
+  "unresolved_outputs": 4,
+  "products": {
+    "Codex": {
+      "original_r4": {
+        "lenient": {
+          "mean_score": 100.0,
+          "core_accuracy": {
+            "numerator": 14,
+            "denominator": 14,
+            "value": 1.0
+          },
+          "errors_E": 0,
+          "silent_error_rate": {
+            "numerator": 0,
+            "denominator": 18,
+            "value": 0.0
+          }
+        },
+        "strict": {
+          "mean_score": 97.89,
+          "core_accuracy": {
+            "numerator": 14,
+            "denominator": 14,
+            "value": 1.0
+          },
+          "errors_E": 2,
+          "silent_error_rate": {
+            "numerator": 2,
+            "denominator": 18,
+            "value": 0.1111111111111111
+          }
+        }
+      },
+      "shared_panel": {
+        "lenient": {
+          "mean_score": 99.6,
+          "core_accuracy": {
+            "numerator": 14,
+            "denominator": 14,
+            "value": 1.0
+          },
+          "errors_E": 0,
+          "silent_error_rate": {
+            "numerator": 0,
+            "denominator": 18,
+            "value": 0.0
+          }
+        },
+        "strict": {
+          "mean_score": 99.6,
+          "core_accuracy": {
+            "numerator": 14,
+            "denominator": 14,
+            "value": 1.0
+          },
+          "errors_E": 1,
+          "silent_error_rate": {
+            "numerator": 0,
+            "denominator": 18,
+            "value": 0.0
+          }
+        }
+      }
+    },
+    "Claude Code": {
+      "original_r4": {
+        "lenient": {
+          "mean_score": 83.73,
+          "core_accuracy": {
+            "numerator": 10,
+            "denominator": 14,
+            "value": 0.7142857142857143
+          },
+          "errors_E": 6,
+          "silent_error_rate": {
+            "numerator": 2,
+            "denominator": 18,
+            "value": 0.1111111111111111
+          }
+        },
+        "strict": {
+          "mean_score": 82.76,
+          "core_accuracy": {
+            "numerator": 10,
+            "denominator": 14,
+            "value": 0.7142857142857143
+          },
+          "errors_E": 12,
+          "silent_error_rate": {
+            "numerator": 11,
+            "denominator": 18,
+            "value": 0.6111111111111112
+          }
+        }
+      },
+      "shared_panel": {
+        "lenient": {
+          "mean_score": 83.73,
+          "core_accuracy": {
+            "numerator": 10,
+            "denominator": 14,
+            "value": 0.7142857142857143
+          },
+          "errors_E": 6,
+          "silent_error_rate": {
+            "numerator": 5,
+            "denominator": 18,
+            "value": 0.2777777777777778
+          }
+        },
+        "strict": {
+          "mean_score": 83.73,
+          "core_accuracy": {
+            "numerator": 10,
+            "denominator": 14,
+            "value": 0.7142857142857143
+          },
+          "errors_E": 6,
+          "silent_error_rate": {
+            "numerator": 5,
+            "denominator": 18,
+            "value": 0.2777777777777778
+          }
+        }
+      }
+    },
+    "Grok Build": {
+      "original_r4": {
+        "lenient": {
+          "mean_score": 81.82,
+          "core_accuracy": {
+            "numerator": 9,
+            "denominator": 14,
+            "value": 0.6428571428571429
+          },
+          "errors_E": 5,
+          "silent_error_rate": {
+            "numerator": 4,
+            "denominator": 18,
+            "value": 0.2222222222222222
+          }
+        },
+        "strict": {
+          "mean_score": 79.74,
+          "core_accuracy": {
+            "numerator": 8,
+            "denominator": 14,
+            "value": 0.5714285714285714
+          },
+          "errors_E": 9,
+          "silent_error_rate": {
+            "numerator": 9,
+            "denominator": 18,
+            "value": 0.5
+          }
+        }
+      },
+      "shared_panel": {
+        "lenient": {
+          "mean_score": 81.82,
+          "core_accuracy": {
+            "numerator": 9,
+            "denominator": 14,
+            "value": 0.6428571428571429
+          },
+          "errors_E": 6,
+          "silent_error_rate": {
+            "numerator": 6,
+            "denominator": 18,
+            "value": 0.3333333333333333
+          }
+        },
+        "strict": {
+          "mean_score": 81.82,
+          "core_accuracy": {
+            "numerator": 9,
+            "denominator": 14,
+            "value": 0.6428571428571429
+          },
+          "errors_E": 6,
+          "silent_error_rate": {
+            "numerator": 6,
+            "denominator": 18,
+            "value": 0.3333333333333333
+          }
+        }
+      }
+    },
+    "Antigravity": {
+      "original_r4": {
+        "lenient": {
+          "mean_score": 83.0,
+          "core_accuracy": {
+            "numerator": 7,
+            "denominator": 14,
+            "value": 0.5
+          },
+          "errors_E": 15,
+          "silent_error_rate": {
+            "numerator": 14,
+            "denominator": 18,
+            "value": 0.7777777777777778
+          }
+        },
+        "strict": {
+          "mean_score": 83.0,
+          "core_accuracy": {
+            "numerator": 7,
+            "denominator": 14,
+            "value": 0.5
+          },
+          "errors_E": 15,
+          "silent_error_rate": {
+            "numerator": 14,
+            "denominator": 18,
+            "value": 0.7777777777777778
+          }
+        }
+      },
+      "shared_panel": {
+        "lenient": {
+          "mean_score": 83.0,
+          "core_accuracy": {
+            "numerator": 7,
+            "denominator": 14,
+            "value": 0.5
+          },
+          "errors_E": 15,
+          "silent_error_rate": {
+            "numerator": 14,
+            "denominator": 18,
+            "value": 0.7777777777777778
+          }
+        },
+        "strict": {
+          "mean_score": 83.0,
+          "core_accuracy": {
+            "numerator": 7,
+            "denominator": 14,
+            "value": 0.5
+          },
+          "errors_E": 15,
+          "silent_error_rate": {
+            "numerator": 14,
+            "denominator": 18,
+            "value": 0.7777777777777778
+          }
+        }
+      }
+    }
+  }
+}

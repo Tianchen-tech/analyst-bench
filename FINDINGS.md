@@ -4,7 +4,9 @@
 
 An interactive version of this report is in [`docs/findings.html`](docs/findings.html).
 
-Two numbers frame the rest of this report:
+**October 5 update:** the same 72 answers now also have a shared three-judge comparison. It leaves the core-performance ordering intact but changes several silent-error labels. The original r4 taxonomy counts below remain preserved; the new comparison is reported separately under [What changed after completing the judge panel](#what-changed-after-completing-the-judge-panel).
+
+Two numbers from the original r4 panel frame the case analysis:
 
 - **Passing answers still contained errors.** 10 of the 53 passing answers contained at least one wrong material claim (lenient panel rule). Under the strict rule it was 20 of 52. Under the lenient rule, none of those errors was in the structured numbers. Every one was in a conclusion, a claim, a driver explanation or the memo.
 - **Unsupported certainty was the most common label.** Judges tagged at least one claim as fabrication or unsupported certainty (taxonomy code E14) in 19 of 72 answers under the lenient rule and 32 of 72 under the strict rule.
@@ -13,7 +15,7 @@ The rest of this report describes five recurring patterns, with real cases and, 
 
 ## How to read this report
 
-- **Data:** the scorer r4 final records for all 72 scored answers: four products × nine tasks × two runs (see [`results/REPORT.md`](results/REPORT.md)).
+- **Data:** the original scorer r4 final records for all 72 scored answers: four products × nine tasks × two runs (see [`results/REPORT.md`](results/REPORT.md)). These remain the source for the case map and taxonomy counts; the shared-panel comparison is a separate result.
 - **Labels:** each wrong claim carries one or more taxonomy codes (E01–E17) assigned by AI judges from other vendors. Codes overlap, so counts across codes cannot be added.
 - **Two rules:** where the two judges disagreed, counts are given as lenient | strict. Antigravity answers had three judges and use a majority vote under both rules.
 - **Quotes:** quotations come from the agents' saved answers. Numbers that would reveal the answer key are left out.
@@ -128,7 +130,7 @@ All counts are out of 18 answers, shown as lenient | strict.
 - **Antigravity:** its overclaiming in narrative and causal statements is the most pronounced, and it drives much of the overall E14 count.
 - **Claude Code:** its weak points were scope drift (Q07) and an interpretation question on Q14 (see Limitations). Some supporting explanations were also stronger than the evidence. The wide gap between its lenient and strict counts means its judges often disagreed about these secondary claims.
 - **Grok Build:** it sometimes found the data problems but did not deliver the requested scope (Q07). It also had one timeout.
-- **Codex:** it delivered consistently in this pilot. Even so, the strict rule flags supporting statements in two answers, so these results do not show that it is error-free.
+- **Codex:** it delivered consistently in this pilot. The original strict rule flags supporting statements in two answers; the shared panel does not confirm silent errors in them. Neither result proves that it is error-free.
 
 ## The evaluator made pattern 1 too
 
@@ -138,6 +140,27 @@ The automatic scorer made the same kind of error as the agents. Before the r4 co
 - a later small purchase against the original refunded payment.
 
 As a result, correct supplementary numbers were marked as errors. The audit found and fixed this in r4, and all 72 answers were regraded (see [`METHODOLOGY.md`](METHODOLOGY.md)). The lesson applies to automated review in general: checking that a number matches is only meaningful after checking that it measures the same population, statistic, event and time window.
+
+## What changed after completing the judge panel
+
+The original leave-own-provider-out design gave products different judges. If one judge interpreted warnings or supporting claims more strictly, excluding that judge from one product could change the apparent error rate. We therefore added 54 author-blinded reviews of the preserved answers. All 72 now have GPT, Claude and Grok reviews, including the author's own provider where applicable, for 216 reviews in total. This is a post-results robustness check; no contestant was rerun.
+
+| Product | Original r4 mean (lenient / strict) | Shared-panel mean | Shared-panel core accuracy | Shared-panel silent errors |
+|---|---:|---:|---:|---:|
+| Codex | 100.00 / 97.89 | 99.60 | 14/14 | 0/18 (0.0%) |
+| Claude Code | 83.73 / 82.76 | 83.73 | 10/14 | 5/18 (27.8%) |
+| Grok Build | 81.82 / 79.74 | 81.82 | 9/14 | 6/18 (33.3%) |
+| Antigravity | 83.00 / 83.00 | 83.00 | 7/14 | 14/18 (77.8%) |
+
+Majority decisions and median component points preserve both orderings: Codex, Claude Code, Antigravity, Grok Build by mean score; Codex, Claude Code, Grok Build, Antigravity by core accuracy. Codex's small decrease from the old lenient mean comes from omitted explicit difference-in-differences quantities in its two Q12 answers. We did not observe a large Codex score decrease after adding GPT under this rule. That addresses the specific unequal-assignment concern without proving the judges are unbiased.
+
+The larger change is methodological. Claude Code's original silent-error count ranged from 2/18 to 11/18 depending on the rule; it is 5/18 with the shared panel. Grok Build moves from 4/18 / 9/18 to 6/18. The agents wrote exactly the same answers. The evaluator's selection of wrong claims and interpretation of warnings changed the reported incidence. Silent-error rates should therefore always be accompanied by the judge assignment and combination rule.
+
+Judges also made factual mistakes. A new review called a module missing because evidence files had neutral aliases; the original archive contains the module. An earlier review called supplementary figures wrong because they were absent from the reference calculation, but an independent calculation confirmed their rounded values. These cases show why disagreement requires evidence review, and why strictness alone is not a measure of judge quality. Original votes were retained.
+
+Five statements across four answers still have exact three-way splits. The declared fallback variants agree on the means, core accuracy and silent-error counts in this table. Codex's wrong-material-claim count is 0/18 or 1/18; the disputed claim is qualified, so its silent-error count is 0/18 under either fallback. This means no silent error was confirmed by this panel rule, not that all Codex statements were independently proved correct. No independent human adjudication has resolved these statements.
+
+The main practical finding survives: getting the calculation right and detecting a data defect do not guarantee a supported explanation or recommendation. The new finding is that the evaluator needs the same care with evidence boundaries as the agent. The [results report](results/REPORT.md#what-changed-with-the-same-judges-for-every-product) and [aggregate comparison](results/pilot1_shared_panel_comparison.json) retain the before/after figures. The taxonomy counts and interactive case map above have not been recomputed as shared-panel labels.
 
 ## What this means for using AI analysts
 
@@ -152,7 +175,8 @@ Arithmetic and code checks can be automated, and the agents rarely failed them. 
 ## Limitations
 
 - **Scale:** nine tasks on one synthetic dataset, two runs per product. The patterns describe the workflow; they do not explain model internals or training, and the per-product differences are not statistical estimates.
-- **Judging:** labels come from AI judges, who disagreed materially on 41 of 72 original panels, and from a documented post-results audit (r4). The lenient | strict ranges show how sensitive the counts are to the combination rule. They are not confidence intervals.
+- **Judging:** labels come from AI judges, who disagreed materially on 41 of 72 original panels, and from a documented post-results audit (r4). That disagreement count is not a rate for the completed three-judge panel. The lenient | strict ranges show rule sensitivity, not confidence intervals. Later backfill reviews reuse the archived prompts and named models, but their dates and observed CLI versions differ. Explicit author masking cannot eliminate every style clue, and same-provider preference can remain.
 - **Q14 ambiguity:** the Q14 request does not say whether "week 6" means calendar-week revenue or the week-6 registration cohort. A cohort reading is defensible, and both the wording and the scoring of that task should be improved before reuse.
 - **Human detection:** this pilot did not test whether people would notice these errors. That remains open.
+- **Who built it:** Claude Opus 5.5 implemented the benchmark and GPT-6.1-sol audited it; these are also the models behind Claude Code and Codex. The case analysis was drafted with the same models. See [How this project was built](README.md#how-this-project-was-built).
 - **Reuse:** publishing these cases reveals part of what the nine Pilot-1 tasks test. Anyone running these tasks should turn off the agent's web search and URL fetching, and ideally allow network access only to the model's inference endpoint. Scores from such runs are a fresh run on known tasks, not a continuation of Pilot-1, and future official rounds should use new tasks.

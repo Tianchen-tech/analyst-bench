@@ -71,7 +71,7 @@ This document describes how Pilot-1 was run and scored. Decisions made during th
 ## 5. Judging
 
 - **Panel:** judges from GPT (via Codex), Claude (via Claude Code) and Grok (via Grok Build). Gemini was unavailable as a judge.
-- **Assignment (leave-own-provider-out):** each blind answer is judged once by every judge from a different vendor than its author. That gives two judges for Codex, Claude Code and Grok Build answers, and three for Antigravity.
+- **Original assignment (leave-own-provider-out):** each blind answer is judged once by every judge from a different vendor than its author. That gives two judges for Codex, Claude Code and Grok Build answers, and three for Antigravity. The separate completed-panel comparison is described in section 8.
 - **What judges get:**
   - the exact task text, the private reference for that task, the anonymized answer (product names masked) and the list of required decisions;
   - no tools, web or subagents, in a fresh session each time.
@@ -100,6 +100,7 @@ This document describes how Pilot-1 was run and scored. Decisions made during th
 | During wave 2 | Secondary speed-adjusted score, capped at +10% | Some wave-2 times, no wave-2 scores |
 | After all judging | Two-judge disagreement reported as lenient and strict | Disagreement counts by product, no scores |
 | October 5, after all results | r4 semantic identity, warning combination, recorded-dispute and terminal-outcome repair; all preserved outputs regraded | All original results and judgments |
+| October 5, after r4 results | Add 54 missing author-blinded reviews and compare all products with the same GPT/Claude/Grok panel | Original product scores and judge disagreements |
 
 **Resolved in r4, after results were visible:** the timeout is an unsuccessful delivery. Content scores remain visible, and accuracy, throughput, repeat agreement and successful-time medians all use the same delivery-success predicate. All 72 preserved outputs were regraded uniformly; no new contestant or judge call was made.
 
@@ -108,3 +109,45 @@ This document describes how Pilot-1 was run and scored. Decisions made during th
 This correction is AI audit work, not a new blinded human assessment. Original eligible judgments are carried forward, and changes are recorded with their source hashes. Newly exposed partial-credit items use explicit archived evidence; unsupported supplementary claims are not called correct just because a spurious reference comparison was removed. Wrong scope remains a delivery error. The demonstrated unrelated rounding/gross warning does not qualify that scope error. Other qualitative judgments retain the original panel's limitations.
 
 The 49 corrected metric identities are covered by regressions across all 72 archived answers and 1,358 metrics. Original source files, 162 judgments, r3 finals and historical aggregates remain preserved. The current local scoring gate binds r4 modules, policy, references and runtime; the original collection bundle remains historical evidence of the conditions used when the agents ran.
+
+## 8. Shared-panel robustness check after results
+
+The original assignment confounds judge composition with product identity. To inspect that sensitivity, 54 missing reviews were collected: 18 per judge, giving GPT, Claude and Grok 72 reviews each. The same 72 preserved contestant outputs are used. Explicit author labels are withheld, each call uses a fresh session, and the exact archived initial prompts and named models are reused at high reasoning effort. The later dates, CLI versions and available model identifiers are recorded; this does not establish identical backend conditions across dates. There were 56 new judge invocations: 54 completed reviews and two format repairs.
+
+The comparison applies the existing r4 identity corrections, majority decisions and median component points to all products. Declared common-country weights for Q16 are evaluated under the frozen deterministic rule before combining points. Where a claim has one wrong, one correct and one unverifiable vote, the existing lenient/strict fallback is retained. Five statements across four outputs have such splits. The two variants agree on the reported means, core accuracy and silent-error counts; Codex's wrong-material-claim count differs by one qualified statement.
+
+The full private comparison was independently reaggregated, with all 1872 protected source hashes checked and the data/task freeze, reference answers, grading policy and runtime gate unchanged. The released [aggregate projection](results/pilot1_shared_panel_comparison.json) contains before/after means, core accuracy and E/S counts with source hashes; it contains no answer key or raw votes. It is separate from the original r4 aggregate.
+
+This comparison was designed after results were known. It removes unequal judge assignment, but does not remove possible same-provider preference, author clues, incomplete references, alias presentation effects or errors shared by judges. Original source votes remain preserved, including demonstrated evaluator mistakes. No independent human adjudication was performed. Majority agreement is evidence about the declared panel rule, not proof of factual correctness.
+
+## 9. Who built and audited the benchmark
+
+**Roles:**
+- **Framework:** GPT-6-Astra designed the overall project framework.
+- **Implementation:** Claude Opus 5.5 (`claude-opus-5-5`, through Claude Code) implemented every concrete step:
+  - the data generator and planted defects;
+  - the task statements and reference answers;
+  - the scorer and SQL replay sandbox;
+  - the run controller and allowlist proxy;
+  - the judging pipeline;
+  - the reports and dashboards.
+- **Audit:** GPT-6.1-sol (`gpt-6.1-sol`, through Codex) audited each step before it was accepted. Findings were fixed and audited again where needed. About 30 written review and audit reports are kept in the private repository.
+- **Owner:** set the direction, ran host-side commands, and made the protocol decisions listed in section 6.
+
+**Overlap with the products under test:**
+- **Claude Code** ran `claude-opus-5-5`, the implementing model.
+- **Codex** ran `gpt-6.1-sol`, the auditing model.
+- **Grok Build and Antigravity:** the models behind them had no building role; Grok took part only as a judge.
+- **The r4 correction:** it was found by the auditing model and verified against the frozen database by the implementing model. It removed false errors from answers of several products, including both Codex Q14 answers. It was applied by rule to all 72 answers, not case by case.
+
+**Safeguards:**
+- Contestant runs used fresh, credentials-only profiles with no memory, no project files and no access to any build session.
+- Reference answers are computed deterministically from the data generator's known truth and replayed SQL, not written by model judgement.
+- Judging was cross-vendor in the original panel; the later shared-panel check used all three judges for every answer.
+
+**Not ruled out:**
+- The tasks, rubric wording and reference framing could match how these two models approach an analysis.
+- The audit could share the auditing model's blind spots.
+- No independent human review of the task set or the scorer has been done.
+
+Readers should weigh the Codex and Claude Code results with this in mind.
