@@ -23,6 +23,11 @@ This document describes how Pilot-1 was run and scored. Decisions made during th
 - Web search was disabled where the product allows it. Antigravity's server-side `search_web` could not be disabled; every query was logged, and there were 0 in the scored attempts.
 - Each run used a fresh product profile containing only credentials, with no user settings, memory or MCP servers.
 - Product versions, executable hashes, settings snapshots and the observed model were recorded per run and checked against a frozen run bundle.
+- **Reasoning effort is matched by name only.** Every product ran at its setting called `high`. These labels are defined by each vendor and are not on a common scale.
+  - For Gemini in Antigravity CLI, `high` was the top of three levels (low, medium, high).
+  - For Codex and Claude Code, `high` is not the top of their effort ladders.
+  - The same label therefore does not mean the same reasoning budget, latency or cost, and the products may have been compared at different relative effort.
+  - A future round should choose and justify one alignment rule before running, for example each vendor's default or matched time and cost, and could add a small effort-sensitivity arm.
 
 ## 3. Isolation and run control
 

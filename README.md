@@ -154,7 +154,8 @@ The evaluation protocol changed during the pilot, and each change is recorded wi
 - a later shared-panel comparison added 54 blind reviews after results were visible; it preserves the original r4 result and documents remaining splits;
 - a secondary speed bonus was added during wave 2;
 - Antigravity's server-side web search could not be disabled; it was used 0 times in scored attempts;
-- Gemini CLI could not be used with a personal Google account, so Antigravity CLI is the Google product.
+- Gemini CLI could not be used with a personal Google account, so Antigravity CLI is the Google product;
+- all products ran at a setting named `high`, but effort levels are vendor-defined and not comparable: for Gemini it was the top of three levels, for Codex and Claude Code it is not the top (see [`METHODOLOGY.md`](METHODOLOGY.md));
 - the models that implemented and audited the benchmark are also the models behind Claude Code and Codex (see [How this project was built](#how-this-project-was-built)).
 
 See [`results/REPORT.md`](results/REPORT.md) and [`METHODOLOGY.md`](METHODOLOGY.md).
