@@ -1,0 +1,7 @@
+# Tool settings only: this repository is a results and methods release, not an installable package.
+# Test dependencies are in requirements-dev.txt.
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["harness", "harness/scripts", "tools"]
+addopts = "-ra"

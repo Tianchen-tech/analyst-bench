@@ -1,0 +1,4 @@
+# Running the tests: python -m pip install -r requirements-dev.txt && python -m pytest
+# tools/recompute_public.py needs only the Python standard library.
+pytest>=8
+jsonschema>=4.18

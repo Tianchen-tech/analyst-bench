@@ -1,0 +1,27 @@
+Analyst Bench content license
+
+Copyright (c) 2026 Tianchen-tech
+
+The code in this repository (harness/, tools/, tests/) is licensed under the
+MIT License; see LICENSE.
+
+Everything else in this repository is licensed under the Creative Commons
+Attribution 4.0 International License (CC BY 4.0). This includes the task
+statements, business definitions, execution contract and answer schemas
+(tasks/), the results and their history (results/), the reports (reports/),
+the dashboards (docs/), and the written documents (README.md, METHODOLOGY.md,
+FINDINGS.md, CHANGELOG.md).
+
+Full license text: https://creativecommons.org/licenses/by/4.0/legalcode
+Summary: https://creativecommons.org/licenses/by/4.0/
+
+Suggested attribution: "Analyst Bench (Tianchen-tech),
+https://github.com/Tianchen-tech/analyst-bench", stating whether you changed
+the material.
+
+A request, not a license condition: if you run the Pilot-1 tasks, please
+report the scores as a fresh run on known tasks, as described in README.md.
+
+Product and company names that appear in this material belong to their owners.
+Their use here identifies the products that were evaluated and does not imply
+endorsement.
