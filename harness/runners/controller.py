@@ -10,7 +10,10 @@ One call to `run_slot` is one fresh session:
   run       the adapter's argv (subprocess argument array; the opening prompt is never shell-interpolated); clean
             environment with no API keys; stdout (product JSON events) and stderr go to files outside work/;
   deadline  1,200 s wall clock from submission; every descendant ever observed is tracked (ps polling) and the whole
-            tree is killed at the cap; outputs are snapshotted only after the kill, so later writes are impossible;
+            tree is killed at the cap; outputs are snapshotted only after the kill. A tracked process is identified by
+            pid AND start time, so a pid that was later reused by an unrelated process is never signalled. Limit: a
+            process that leaves both the tree and the run's process group between two polls is not tracked; a per-run
+            user account or a VM would close that gap;
   record    design-6.1 run fields: identities (version command, executable hash, observed model from the transcript),
             settings snapshot hash, the runner binding (hashes of the controller, proxy, adapter and products.json in force), times, stop reason, usage when exposed, egress allowed/denied, output hashes, the
             unchanged database hash, the canary result. Nothing is resumed, repaired or replaced here.
@@ -93,39 +96,76 @@ def contestant_profile(run_root: Path, proxy_port: int, extra_reads: list[Path],
 {extra_rules}"""
 
 
-def _descendants(root_pid: int) -> set[int]:
-    out = subprocess.run(["/bin/ps", "-axo", "pid=,ppid="], capture_output=True, text=True).stdout
-    children: dict[int, list[int]] = {}
+ProcessTable = dict[int, tuple[int, int, str]]          # pid -> (ppid, pgid, start time as printed by ps)
+
+
+def _process_table() -> ProcessTable:
+    """Every live (non-zombie) process. The start time (`lstart`) tells a process apart from a later one that reuses its
+    pid. `-A` lists all processes on macOS (same as -ax) and on Linux."""
+    out = subprocess.run(["/bin/ps", "-A", "-o", "pid=,ppid=,pgid=,stat=,lstart="], capture_output=True, text=True).stdout
+    return _parse_process_table(out)
+
+
+def _parse_process_table(out: str) -> ProcessTable:
+    table: ProcessTable = {}
     for line in out.splitlines():
+        parts = line.split(None, 4)
+        if len(parts) < 5 or parts[3].startswith("Z"):
+            continue
         try:
-            pid, ppid = map(int, line.split())
+            pid, ppid, pgid = int(parts[0]), int(parts[1]), int(parts[2])
         except ValueError:
             continue
+        table[pid] = (ppid, pgid, " ".join(parts[4].split()))
+    return table
+
+
+def _descendants(root_pid: int, table: ProcessTable | None = None) -> dict[int, str]:
+    """{pid: start} of the live descendants of root_pid. The caller guarantees that root_pid is still the process it
+    means (an unreaped child, or a tracked process whose start time was just verified)."""
+    table = _process_table() if table is None else table
+    children: dict[int, list[int]] = {}
+    for pid, (ppid, _, _) in table.items():
         children.setdefault(ppid, []).append(pid)
-    found, stack = set(), [root_pid]
+    found: dict[int, str] = {}
+    stack = [root_pid]
     while stack:
         p = stack.pop()
         for c in children.get(p, []):
             if c not in found:
-                found.add(c)
+                found[c] = table[c][2]
                 stack.append(c)
     return found
 
 
-def _alive(pid: int) -> bool:
-    try:
-        os.kill(pid, 0)
-        return True
-    except (ProcessLookupError, PermissionError):
-        return False
+def _kill_targets(proc: subprocess.Popen, known: dict[int, str], table: ProcessTable) -> dict[int, str]:
+    """The run's processes that are alive now: tracked processes still holding the pid AND start time they had when
+    first seen, members of the run's process group, and the live descendants of both. Group members are trusted only
+    while the group's number cannot belong to someone else: the session leader is unreaped (its pid is held), or no
+    live process has that pid. A pid that now belongs to a later, unrelated process is never included."""
+    live = {pid: start for pid, start in known.items() if pid in table and table[pid][2] == start}
+    if proc.returncode is None or proc.pid not in table:
+        live.update({pid: info[2] for pid, info in table.items() if info[1] == proc.pid})
+    roots = list(live) + ([proc.pid] if proc.returncode is None else [])
+    for root in roots:
+        live.update(_descendants(root, table))
+    return live
 
 
-def _kill_tree(proc: subprocess.Popen, known: set[int]) -> int:
-    known |= _descendants(proc.pid)
+def _kill_tree(proc: subprocess.Popen, known: dict[int, str]) -> int:
+    """TERM, then KILL, every process of the run; returns how many of them are still alive afterwards. `known` gains
+    every process found while killing (descendants_seen in the record)."""
     for sig in (signal.SIGTERM, signal.SIGKILL):
-        for pid in [proc.pid, *sorted(known)]:
+        targets = _kill_targets(proc, known, _process_table())
+        known.update({pid: start for pid, start in targets.items() if pid != proc.pid})     # descendants only
+        if proc.returncode is None:                     # unreaped leader: its group id cannot have been reused
             try:
-                os.killpg(pid, sig) if pid == proc.pid else os.kill(pid, sig)
+                os.killpg(proc.pid, sig)
+            except (ProcessLookupError, PermissionError):
+                pass
+        for pid in sorted(targets):
+            try:
+                os.kill(pid, sig)
             except (ProcessLookupError, PermissionError):
                 pass
         time.sleep(1.0 if sig == signal.SIGTERM else 0.2)
@@ -133,7 +173,7 @@ def _kill_tree(proc: subprocess.Popen, known: set[int]) -> int:
         proc.wait(timeout=10)
     except subprocess.TimeoutExpired:
         pass
-    return sum(1 for pid in known if _alive(pid))
+    return len(_kill_targets(proc, known, _process_table()))
 
 
 def _snapshot(work: Path, dest: Path, exclude: set[str]) -> dict[str, Any]:
@@ -268,7 +308,7 @@ def run_slot(product: str, task_dir: Path, out_dir: Path, run_meta: dict[str, An
             argv = adapter.argv(spec, work, cfg["opening_prompt"])
             record["argv_redacted"] = [a if a != cfg["opening_prompt"] else "<OPENING_PROMPT>" for a in argv]
             stdout_p, stderr_p = out_dir / "transcript.jsonl", out_dir / "stderr.log"
-            known: set[int] = set()
+            known: dict[int, str] = {}                     # pid -> start time of every descendant seen
             record["started_at_utc"] = _now()
             start = time.monotonic()
             with open(stdout_p, "wb") as so, open(stderr_p, "wb") as se:
@@ -279,7 +319,7 @@ def run_slot(product: str, task_dir: Path, out_dir: Path, run_meta: dict[str, An
                     if time.monotonic() - start >= limit:
                         stop = "timeout"
                         break
-                    known |= _descendants(proc.pid)
+                    known.update(_descendants(proc.pid))      # safe: proc is not reaped yet, so its pid is still its own
                     time.sleep(0.25)
                 ended = time.monotonic()                     # measured at exit or at the deadline, before the kill routine
                 left = _kill_tree(proc, known)

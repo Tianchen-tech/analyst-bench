@@ -2,6 +2,9 @@
 
 A provisional record never carries a final score: `final` is produced only by review.finalize once every pending atom,
 claim, critical predicate and cap has an owner decision in the review log.
+
+The task-specific modules (`atoms`, `tasks`: scoring rules and the metric-alias registry) are not published. They are
+imported only when a provisional record is built, so the helpers below (and `review`, `aggregate`) import without them.
 """
 
 from __future__ import annotations
@@ -10,9 +13,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .atoms import RULES, atom, map_metrics, metric_claims
 from .intake import Intake
-from .tasks import FORMAT_ZERO, provisional
 
 CORE = ("Q03", "Q04", "Q07", "Q12", "Q14", "Q16", "Q17")
 UNANSWERABLE = ("Q26", "Q27")
@@ -55,9 +56,17 @@ def _answer_claims(intake: Intake) -> list[dict[str, Any]]:
     return out
 
 
+def _path_links(pointer: str, ref: str) -> bool:
+    """Whether a warning's result_paths pointer links the claim at `ref`: the same location, the claim's immediately
+    containing record (a pointer of at least three segments, so `/result` or a whole array stays a general note), or a
+    value inside the claim's record (e.g. `/result/drivers/0/contribution` for the driver claim `/result/drivers/0`;
+    the task contract lets a warning name a single value)."""
+    return pointer == ref or (ref.startswith(pointer + "/") and pointer.count("/") >= 3) or pointer.startswith(ref + "/")
+
+
 def _warnings_for(intake: Intake, ref: str) -> list[int]:
-    """Indices of answer warnings that explicitly link this claim (claim_ids or a result_paths pointer to the value or
-    its immediately containing record). Whether the warning QUALIFIES the claim is an owner decision."""
+    """Indices of answer warnings that explicitly link this claim (claim_ids, or a result_paths pointer accepted by
+    `_path_links`). Whether the warning QUALIFIES the claim is an owner decision."""
     if intake.answer_parse != "ok":
         return []
     out = []
@@ -68,14 +77,15 @@ def _warnings_for(intake: Intake, ref: str) -> list[int]:
         if ref.startswith("/claims/"):
             c = intake.answer["claims"][int(ref.split("/")[2])]
             cid = c.get("id")
-        rp = ref.replace("/result", "/result", 1)
-        hit = (cid is not None and cid in ids) or any(p == rp or (rp.startswith(p + "/") and p.count("/") >= 3) for p in paths)
+        hit = (cid is not None and cid in ids) or any(_path_links(p, ref) for p in paths)
         if hit:
             out.append(i)
     return out
 
 
 def build_provisional(run: dict[str, Any], intake: Intake, gold: dict[str, Any], replay: dict[str, Any] | None = None) -> dict[str, Any]:
+    from .atoms import RULES, atom, map_metrics, metric_claims     # private: task-specific scoring rules
+    from .tasks import FORMAT_ZERO, provisional
     task = run["task_id"]
     mapped = map_metrics(task, intake.answer) if intake.answer_parse == "ok" else []
     mclaims, values = metric_claims(task, mapped, gold)

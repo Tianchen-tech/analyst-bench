@@ -1,15 +1,18 @@
-"""Judge protocol v1 (ID-47): build the blind prompt, call Grok headless, validate, and combine independent judgments.
+"""Judge protocol v1 (ID-47): build the blind prompt, validate judgments and combine independent judgments.
 
   prompt      protocol.md + the public task.md + the task's private reference (gold without provenance/bindings) + the
               blind packet (answer.json, memo, evidence, replay status) + the exact decision keys. No product identity,
               run id, repetition or slot order is ever included (the packet is already the reviewer projection).
-  call        `grok --prompt-file` in a fresh empty working directory, web search, subagents and tools off, structured
-              JSON output; raw stdout/stderr kept with hashes.
+  call        one fresh headless CLI call per judgment, made by backends.py with a minimal environment (GPT via Codex,
+              Claude via Claude Code, Grok via Grok Build). `grok_argv` builds the Grok command line: web search and
+              subagents disabled, structured JSON output, at most four turns. The original wave-1 Grok-only caller
+              (superseded with ID-50) inherited the caller's environment and was removed after Pilot-1 (CHANGELOG.md).
   validate    every required key present with a valid value; automatic claim verdicts are kept (a judge disagreement is
               recorded as a dispute note, never as an override); up to two repair calls listing what was missing.
-  consensus   two independent judgments; any decision on which they differ triggers a third, and the majority (median for
-              atom points) decides. Items with no majority are listed for the owner. Memo claims count when a majority
-              of runs report the same quote (fuzzy match).
+  consensus   majority of the given judgments (median for atom points). Items with no majority are returned as
+              unresolved; their provisional value is the first one in the given log order, so the output never depends
+              on hash randomization. Memo claims count when a majority report the same quote (fuzzy match).
+              scripts/panel_combine.py uses it for three eligible judges and the lenient/strict rule (ID-55) for two.
 """
 
 from __future__ import annotations
@@ -19,8 +22,7 @@ import hashlib
 import json
 import re
 import statistics
-import subprocess
-import tempfile
+from collections import Counter
 from pathlib import Path
 from typing import Any
 
@@ -213,9 +215,13 @@ def keep_automatic(log: dict[str, Any], pk: dict[str, Any]) -> dict[str, Any]:
 # ------------------------------------------------------------------------------------------------------- consensus --
 
 def _majority(values: list[Any]) -> tuple[Any, bool]:
+    """(most common value, whether it is a strict majority). A tie goes to the value that appears first in `values`:
+    the result must not depend on set iteration order, which changes with PYTHONHASHSEED."""
     keyed = [json.dumps(v, sort_keys=True) for v in values]
-    best = max(set(keyed), key=keyed.count)
-    return json.loads(best), keyed.count(best) * 2 > len(values)
+    counts = Counter(keyed)
+    top = max(counts.values())
+    best = next(k for k in keyed if counts[k] == top)
+    return json.loads(best), top * 2 > len(values)
 
 
 def _same_quote(a: str, b: str) -> bool:
@@ -320,32 +326,3 @@ def grok_argv(binary: str, prompt_file: Path, workdir: Path, model: str | None, 
     if effort:
         argv += ["--reasoning-effort", effort]
     return argv
-
-
-def call(binary: str, prompt: str, out_dir: Path, tag: str, model: str | None, effort: str | None, timeout: int = 1200) -> dict[str, Any]:
-    """One fresh headless Grok call in an empty working directory. Raw outputs are kept beside the prompt."""
-    out_dir.mkdir(parents=True, exist_ok=True)
-    (out_dir / f"{tag}.prompt.md").write_text(prompt, encoding="utf-8")
-    with tempfile.TemporaryDirectory(prefix="judge-") as wd:
-        pf = Path(wd) / "prompt.md"
-        pf.write_text(prompt, encoding="utf-8")
-        argv = grok_argv(binary, pf, Path(wd), model, effort)
-        try:
-            r = subprocess.run(argv, cwd=wd, capture_output=True, text=True, timeout=timeout, stdin=subprocess.DEVNULL)
-            rc, so, se = r.returncode, r.stdout, r.stderr
-        except subprocess.TimeoutExpired as exc:
-            rc, so, se = "timeout", exc.stdout or "", exc.stderr or ""
-            so, se = (so.decode() if isinstance(so, bytes) else so), (se.decode() if isinstance(se, bytes) else se)
-    (out_dir / f"{tag}.stdout").write_text(so, encoding="utf-8")
-    (out_dir / f"{tag}.stderr").write_text(se, encoding="utf-8")
-    meta: dict[str, Any] = {}
-    try:
-        top = json.loads(so)
-        meta = {"models": sorted((top.get("modelUsage") or {}).keys()), "num_turns": top.get("num_turns"),
-                "stop_reason": top.get("stopReason"), "usage": top.get("usage"),
-                "reported_cost_usd": top.get("total_cost_usd"),
-                "reported_cost_label": "CLI-reported figure; under a grok.com subscription login this is not a separate charge"}
-    except (ValueError, AttributeError):
-        pass
-    return {"tag": tag, "returncode": rc, "prompt_sha256": sha(prompt), "stdout_sha256": sha(so), "parsed": extract_json(so), "meta": meta,
-            "argv_redacted": [a if not a.startswith("{") else "<schema>" for a in argv]}
