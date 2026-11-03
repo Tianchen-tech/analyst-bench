@@ -16,8 +16,8 @@
 | Adapter | `private/runners/adapters/codex_exec.py` (`ADAPTER_ID = "codex_exec"`) | `private/runners/adapters/claude_code_print.py` (`ADAPTER_ID = "claude_code_print"`) |
 | Model / effort | `gpt-6.1-sol`, `model_reasoning_effort="high"` (identity to be observed at preflight) | `claude-opus-5-5`, `--effort high` (to be observed) |
 | Auth | ChatGPT Plus: `auth.json` of a clean baseline profile (`.tools/profiles/codex`), copied into each run | Claude Pro: owner-created `claude setup-token` file (`.tools/profiles/claude/oauth_token`), passed as `CLAUDE_CODE_OAUTH_TOKEN`; never printed or recorded |
-| Session | `exec --json --ephemeral --ignore-user-config --ignore-rules --skip-git-repo-check`, web search disabled; Codex's inner sandbox bypassed inside the external boundary | `-p --output-format stream-json`, `--permission-mode acceptEdits`, frozen tools Read/Write/Edit/Bash/Glob/Grep, WebSearch/WebFetch disallowed, no setting sources, strict MCP, no session persistence, non-essential traffic off |
-| Egress allowlist (to be confirmed by the smoke run) | chatgpt.com, *.chatgpt.com, api.openai.com, auth.openai.com | api.anthropic.com, claude.ai, *.claude.ai, console.anthropic.com |
+| Session | `exec --json --ignore-user-config --ignore-rules --skip-git-repo-check`, web search disabled; Codex's inner sandbox bypassed inside the external boundary. The first version also passed `--ephemeral`; it was dropped after the smoke run (see [Smoke runs](#smoke-runs-2026-10-03)). | `-p --output-format stream-json`, `--permission-mode acceptEdits`, frozen tools Read/Write/Edit/Bash/Glob/Grep, WebSearch/WebFetch disallowed, no setting sources, strict MCP, no session persistence, non-essential traffic off |
+| Egress allowlist | First proposal: chatgpt.com, *.chatgpt.com, api.openai.com, auth.openai.com. After the smoke run: chatgpt.com, ab.chatgpt.com, auth.openai.com. | First proposal: api.anthropic.com, claude.ai, *.claude.ai, console.anthropic.com. After the smoke run: api.anthropic.com. |
 
 API-key variables are refused in a contestant environment.
 

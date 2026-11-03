@@ -32,7 +32,7 @@ it, so the driver can stop between slots and resume later without re-running or 
                every slot the driver re-reads the ledger and stops if the current driver hash is not its own (a driver
                left waiting from before an accepted change) or if the slot was already started by another process.
                (Wave 1, 2026-10-04: a pre-change driver left waiting in another terminal woke after the reset and tried
-               slot 24's replacement while the current driver was running it; see WAVE1_REPORT.md.)
+               slot 24's replacement while the current driver was running it; see reports/wave1_operations.md.)
 """
 
 from __future__ import annotations

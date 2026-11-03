@@ -328,12 +328,21 @@ class _RUsageInfoV2(ctypes.Structure):
         "ri_child_elapsed_abstime", "ri_diskio_bytesread", "ri_diskio_byteswritten")]
 
 
-_LIBPROC = ctypes.CDLL("/usr/lib/libproc.dylib")
+_LIBPROC: ctypes.CDLL | None = None
+
+
+def _libproc() -> ctypes.CDLL:
+    """macOS libproc, loaded on first use so that the module (path checks, constants) also imports on other systems.
+    `_sandboxed` loads it before starting any process, so a missing library still fails before a replay begins."""
+    global _LIBPROC
+    if _LIBPROC is None:
+        _LIBPROC = ctypes.CDLL("/usr/lib/libproc.dylib")
+    return _LIBPROC
 
 
 def _footprint(pid: int) -> int | None:
     info = _RUsageInfoV2()
-    return int(info.ri_phys_footprint) if _LIBPROC.proc_pid_rusage(pid, 2, ctypes.byref(info)) == 0 else None
+    return int(info.ri_phys_footprint) if _libproc().proc_pid_rusage(pid, 2, ctypes.byref(info)) == 0 else None
 
 
 def _limiter(file_limit: int):
@@ -373,6 +382,7 @@ def _sandboxed(py: Path, cwd: Path, argv: list[str], env: dict[str, str], time_l
                out_path: Path, err_path: Path, pid_file: Path | None = None,
                file_limit: int = FILE_SIZE_LIMIT) -> tuple[str | None, int | None, float, int, bool]:
     """Run one sandboxed single process; returns (forced status or None, returncode, elapsed, peak, measurement_failed)."""
+    _libproc()                                   # the memory monitor must be available before anything starts
     profile = cwd.parent / f"{cwd.name}.sb"
     profile.write_text(_profile(cwd, py), encoding="utf-8")
     with open(out_path, "wb") as out_f, open(err_path, "wb") as err_f:

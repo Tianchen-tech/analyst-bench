@@ -67,9 +67,11 @@ def parse(stdout: Path, stderr: Path) -> tuple[dict[str, Any], dict[str, Any]]:
         quota = {"status": last.get("status"), "five_hour_utilization": (win.get("five_hour") or {}).get("utilization"),
                  "seven_day_utilization": (win.get("seven_day") or {}).get("utilization"), "resets_at": last.get("resetsAt"),
                  "overage": last.get("overageStatus"), "using_overage": last.get("isUsingOverage")}
+    # The requested effort is recorded from the product settings in identity.reasoning_setting; the transcript only says
+    # whether per-turn effort is active, not which level, so nothing here restates the requested value.
     return usage, {"models_in_transcript": sorted(m for m in models if m), "events": len(events), "tool_uses": len(tools),
-                   "effort_requested": "high", "per_turn_effort_active": init.get("per_turn_effort_active"),
-                   "effort_level_observed": None, "effort_note": "the product does not echo the effort level; the flag was passed",
+                   "per_turn_effort_active": init.get("per_turn_effort_active"), "effort_level_observed": None,
+                   "effort_note": "the product does not echo the effort level; the requested level (--effort) is identity.reasoning_setting",
                    "tools_available": init.get("tools"), "permission_mode": init.get("permissionMode"),
                    "claude_code_version": init.get("claude_code_version"), "quota": quota,
                    "web_tool_uses": sum(1 for t in tools if t in ("WebSearch", "WebFetch")),

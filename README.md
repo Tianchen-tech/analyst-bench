@@ -76,6 +76,8 @@ The task statements, results and error cases in this repository are public, so a
 - ideally allow network access only to the model's own inference endpoint, as the Pilot-1 harness did (see `harness/runners/proxy.py`);
 - if a product's server-side search cannot be switched off, record and report every search it makes.
 
+The output-contract example in every `task.md` shows `"task_id": "Q01"`, which is a placeholder. The scorer requires each answer to carry its own task ID, so an agent that copies the example literally fails the format check. No Pilot-1 attempt did. The task files are kept exactly as the agents saw them; a future task export should print each task's own ID in the example.
+
 Treat any new scores as a fresh run on known tasks, not as a continuation of Pilot-1. The dataset is not included in this repository.
 
 ## How the evaluation works
@@ -94,6 +96,21 @@ See [`METHODOLOGY.md`](METHODOLOGY.md) for the full protocol. In short:
    - arithmetic is protected after checking metric identity; semantic objections require a versioned resolution and remain visible.
 4. **Metrics:** core accuracy, valid abstention, trap recall, error and silent-error incidence, and time. A secondary speed-adjusted score rewards correct answers only.
 
+## Checking the published numbers
+
+```bash
+python tools/recompute_public.py
+```
+
+This recomputes the metrics from the per-attempt records in [`results/pilot1_four_products.json`](results/pilot1_four_products.json). It then checks them against the results tables and quoted figures in this README, [`METHODOLOGY.md`](METHODOLOGY.md), [`results/REPORT.md`](results/REPORT.md) and [`FINDINGS.md`](FINDINGS.md), and against the data embedded in both dashboards. It needs only the Python standard library and exits with an error listing every value that disagrees.
+- Counts and medians are checked exactly; stored rates and totals to their rounding.
+- Per-attempt scores in the results file are rounded to 0.1, so mean scores are checked to within that rounding.
+- Trap recall and format failures have no public per-attempt records, so only their published aggregates are checked.
+
+`python tools/recompute_public.py --write-dashboard` regenerates the data block of [`docs/index.html`](docs/index.html) from the results file.
+
+The harness tests run with `pytest` after `pip install -r requirements-dev.txt`. They cover the public parts of the harness; the private scoring modules and the dataset are not needed.
+
 ## Repository layout
 
 | Path | Contents |
@@ -103,6 +120,9 @@ See [`METHODOLOGY.md`](METHODOLOGY.md) for the full protocol. In short:
 | `harness/judge/` | Judge protocol (the exact instructions judges receive), prompt builder, validation and consensus, judge backends |
 | `harness/grader/` | Scorer core: intake, finalize and review, aggregation, SQL replay sandbox, run-bundle validator |
 | `harness/scripts/` | The command-line entry points used to run preflights, waves, grading, judging and the final aggregation |
+| `tools/` | `recompute_public.py`, which recomputes the published metrics and checks the README, reports and dashboards against them |
+| `tests/` | Tests for the public harness code and the published results |
+| `CHANGELOG.md` | Harness changes made after the Pilot-1 results were published |
 | `FINDINGS.md` | Error patterns across the 72 answers, with cases and reviewer checks |
 | `results/` | Preserved r4 results (`pilot1_four_products.json`), a separate shared-panel aggregate comparison and the results report |
 | `reports/` | Operational reports: runner build and preflight, wave-1 operations and incidents |
@@ -120,7 +140,7 @@ The following are withheld so the task set can be reused for future rounds:
 
 The 342 MB DuckDB file is not in this repository either.
 
-Because of this, the harness here documents exactly how the evaluation ran, but it cannot reproduce the scores end to end on its own.
+Because of this, the harness here documents how the evaluation ran, but it cannot reproduce the scores end to end on its own. The harness exactly as published with the Pilot-1 results is at commit [`1910d3d`](https://github.com/Tianchen-tech/analyst-bench/tree/1910d3d242205687505f2380bd79d08cf1aa82d1/harness). Fixes made after that are listed in [`CHANGELOG.md`](CHANGELOG.md). They apply to future rounds; the Pilot-1 results were not regenerated.
 
 ## How this project was built
 
@@ -159,3 +179,7 @@ The evaluation protocol changed during the pilot, and each change is recorded wi
 - the models that implemented and audited the benchmark are also the models behind Claude Code and Codex (see [How this project was built](#how-this-project-was-built)).
 
 See [`results/REPORT.md`](results/REPORT.md) and [`METHODOLOGY.md`](METHODOLOGY.md).
+
+## License
+
+The code (`harness/`, `tools/`, `tests/`) is released under the MIT License ([`LICENSE`](LICENSE)). Everything else, including the task statements and schemas, results, reports, findings, documentation and dashboards, is released under the Creative Commons Attribution 4.0 International License ([`LICENSE-CONTENT`](LICENSE-CONTENT)).
