@@ -4,9 +4,10 @@
     python scripts/preflight.py smoke  [--product P]  # one toy1 run per product: observe identity, egress, usage
     python scripts/preflight.py runs                  # the eight runs: 2 products x toy1/toy2 x 2 repetitions
     python scripts/preflight.py checks                # per product: one forced timeout (8 s cap) and one blocked-access run
-    ... --wave 2                                      # wave 2 products (Grok Build, Gemini CLI; ID-49)
+    ... --wave 2                                      # wave 2 products (Grok Build, Antigravity CLI; ID-49/52)
 
-Outputs go to private/runs/preflight/<stage>-<UTC time>/ (git-ignored; every file is hash-recorded in its run record).
+Outputs go to private/runs/preflight/<stage>-<UTC time>/ (wave 2: private/runs/preflight-wave2/; git-ignored; every file
+is hash-recorded in its run record).
 Runs use the owner's subscription allowance; nothing is purchased. A usage-limit signal stops the stage (ID-43).
 """
 

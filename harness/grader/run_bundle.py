@@ -6,7 +6,8 @@ inside the project root with no `..`, no absolute prefix and no symlinked compon
 hash to the recorded value. Required references sit at canonical paths, so a text file renamed as a dependency is not that
 dependency. Contract (design 6.1-6.5, Section 8 Pilot-1, Phase 6):
 
-  products       exactly Codex and Claude Code; adapter ID, canonical adapter file declaring that ID, controller-observed
+  products       exactly the wave's two products (wave 1: Codex and Claude Code; wave 2: Grok Build and Antigravity,
+                 ID-49, bundle in private/run_bundle/wave2); adapter ID, canonical adapter file declaring that ID, controller-observed
                  identity (version, executable hash, CLI interface, first-party provider, model, reasoning setting,
                  selection source, observation sources, settings snapshot), frozen settings (permission map, network
                  allowlist, web search disabled, declared overrides) and an approved budget decision with a ceiling.
